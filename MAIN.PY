@@ -1,70 +1,108 @@
-# app.py
-
 import streamlit as st
 import pandas as pd
-from backend import fetch_channel_details, fetch_video_ids, fetch_videos_details, make_df
-from database import init_db, save_channel, save_videos, SessionLocal
+from googleapiclient.discovery import build
+from config import YT_KEY
 
-# Initialize database
-init_db()
+# ---------------- PAGE CONFIG ----------------
+st.set_page_config(
+    page_title="YouTube Analytics & Insight Dashboard",
+    layout="wide"
+)
 
-st.set_page_config(page_title="YouTube Dashboard", layout="wide")
-st.title("📊 YouTube Analytics Dashboard (SQLite Edition)")
+# ---------------- YOUTUBE API ----------------
+yt = build("youtube", "v3", developerKey=YT_KEY)
 
-# ------------------------------------
-# Sidebar Input
-# ------------------------------------
-with st.sidebar:
-    channel_id = st.text_input("Enter YouTube Channel ID", placeholder="UC_x5XG1OV2P6uZZ5FSM9Ttw")
-    max_videos = st.slider("Number of Videos", 5, 50, 20)
-    analyze = st.button("Analyze")
+# ---------------- DATA FETCH FUNCTION ----------------
+def fetch_data(channel_id):
+    video_ids = []
 
-# ------------------------------------
-# On Analyze Click
-# ------------------------------------
-if analyze:
-    if not channel_id:
+    req = yt.search().list(
+        part="id",
+        channelId=channel_id,
+        maxResults=50,
+        type="video"
+    )
+
+    while req:
+        res = req.execute()
+        for item in res["items"]:
+            video_ids.append(item["id"]["videoId"])
+        req = yt.search().list_next(req, res)
+
+    videos = []
+    for i in range(0, len(video_ids), 50):
+        ids = ",".join(video_ids[i:i+50])
+        res = yt.videos().list(
+            part="snippet,statistics",
+            id=ids
+        ).execute()
+
+        for v in res["items"]:
+            s = v["snippet"]
+            stt = v["statistics"]
+
+            views = int(stt.get("viewCount", 0))
+            likes = int(stt.get("likeCount", 0))
+            comments = int(stt.get("commentCount", 0))
+            engagement = (likes + comments) / views if views != 0 else 0
+
+            videos.append({
+                "Title": s["title"],
+                "Published Date": s["publishedAt"],
+                "Views": views,
+                "Likes": likes,
+                "Comments": comments,
+                "Engagement Rate": engagement
+            })
+
+    df = pd.DataFrame(videos)
+    df["Published Date"] = pd.to_datetime(df["Published Date"]).dt.date
+    return df
+
+# ---------------- UI ----------------
+st.title("📊 YouTube Analytics & Insight Dashboard")
+st.caption("Analyze YouTube channel performance visually")
+
+st.sidebar.header("🔍 Channel Input")
+channel_id = st.sidebar.text_input("Enter YouTube Channel ID")
+
+# ---------------- BUTTON ACTION ----------------
+if st.sidebar.button("🚀 Fetch Data"):
+    if channel_id.strip() == "":
         st.error("Please enter a valid Channel ID")
     else:
-        with st.spinner("Fetching channel details..."):
-            channel = fetch_channel_details(channel_id)
+        with st.spinner("Fetching data from YouTube..."):
+            df = fetch_data(channel_id)
 
-        if channel is None:
-            st.error("Invalid Channel ID")
-        else:
-            # Display channel info
-            st.header(f"📺 {channel['channel_name']}")
-            col1, col2, col3 = st.columns(3)
-            col1.metric("Subscribers", channel["subscriber_count"])
-            col2.metric("Total Views", channel["view_count"])
-            col3.metric("Total Videos", channel["video_count"])
+        st.success("Data fetched successfully ✅")
 
-            with st.spinner("Fetching video list..."):
-                video_ids = fetch_video_ids(channel_id, max_videos)
+        # ---------- VIDEO DATA TABLE (TOP) ----------
+        st.subheader("📋 Video Data (All Videos)")
+        st.dataframe(df, use_container_width=True)
 
-            with st.spinner("Fetching video details..."):
-                videos = fetch_videos_details(video_ids)
+        st.divider()
 
-            df = make_df(videos)
+        # ---------- ENGAGEMENT RATE ----------
+        st.subheader("📊 Engagement Rate per Video (Top 10)")
+        eng_df = df.sort_values("Engagement Rate", ascending=False).head(10)
+        st.bar_chart(eng_df.set_index("Title")["Engagement Rate"])
 
-            # Save to DB
-            session = SessionLocal()
-            save_channel(session, channel)
-            save_videos(session, videos, channel_id)
+        st.divider()
 
-            st.success("Data saved to SQLite database!")
+        # ---------- VIEWS PER VIDEO ----------
+        st.subheader("📈 Views per Video (Top 10)")
+        views_df = df.sort_values("Views", ascending=False).head(10)
+        st.bar_chart(views_df.set_index("Title")["Views"])
 
-            # ------------------------------
-            # TABLE
-            # ------------------------------
-            st.subheader("Video Insights Table")
-            st.dataframe(df)
+        st.divider()
 
-            # ------------------------------
-            # Charts
-            # ------------------------------
-            st.subheader("Views per Video")
-            st.bar_chart(df.set_index("title")["view_count"])
+        # ---------- LIKES vs VIEWS ----------
+        st.subheader("❤️ Likes vs Views (Trend)")
+        lv_df = df.sort_values("Views")
+        st.line_chart(lv_df[["Views", "Likes"]])
 
-            st.subheader("Like Rate")
-            st.line_chart(df.set_index("title")["like_rate"])
+        st.divider()
+
+        # ---------- SAVE CSV ----------
+        df.to_csv("clean_youtube_data.csv", index=False)
+        st.success("Data saved as clean_youtube_data.csv")
