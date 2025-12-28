@@ -1,0 +1,13 @@
+{
+    "name": "youtube-analytics-compat",
+    "version": "1.0.0",
+    "description": "NPM compatibility layer for Python Flask App",
+    "scripts": {
+        "start": "python run.py",
+        "dev": "python run.py",
+        "setup": "pip install -r backend/requirements.txt",
+        "db:init": "python init_db.py"
+    },
+    "author": "",
+    "license": "ISC"
+}

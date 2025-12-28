@@ -1,0 +1,4 @@
+Startingimport traceback
+App created.
+Creating all tables...
+Tables created successfully!

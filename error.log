@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "C:\Users\asus\infosys project\init_db.py", line 20, in <module>
+    init_database()
+  File "C:\Users\asus\infosys project\init_db.py", line 6, in init_database
+    app = create_app()
+          ^^^^^^^^^^^^
+  File "C:\Users\asus\infosys project\backend\app.py", line 7, in create_app
+    app = Flask(__name__, static_folder='../frontend/public', static_url_path='')
+          ^^^^^
+NameError: name 'Flask' is not defined

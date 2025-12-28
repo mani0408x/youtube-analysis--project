@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - YouTube Analytics</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="dashboard-header">
+            <h2>Analytics Dashboard</h2>
+            <div class="user-info" id="user-info">
+                <!-- User details injected here -->
+            </div>
+            <a href="/auth/logout" class="btn-logout">Logout</a>
+        </div>
+
+        <div class="search-bar">
+            <div class="input-group" id="channel-inputs-container">
+                <input type="text" id="channel-id-input" placeholder="Enter Channel ID (e.g., UC...)">
+                <!-- Additional inputs will be injected here -->
+            </div>
+            <div class="controls">
+                <button id="analyze-btn">Analyze</button>
+                <div class="toggle-container">
+                    <label class="switch">
+                        <input type="checkbox" id="compare-mode-toggle">
+                        <span class="slider round"></span>
+                    </label>
+                    <span style="color: var(--text-secondary); font-size: 0.9rem;">Compare Mode</span>
+                    <div id="compare-count-wrapper" style="display:none; margin-left: 10px;">
+                        <input type="number" id="compare-count" min="2" max="5" value="2"
+                            style="width: 50px; padding: 5px;">
+                        <span style="color: var(--text-secondary); font-size: 0.8rem;">Channels</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="loading" style="display:none; text-align: center; margin: 40px auto;">
+            <span class="loader"></span>
+            <p style="color: var(--text-secondary); margin-top: 10px;">Analyzing Channel Data...</p>
+        </div>
+
+        <div id="results-area" style="display:none;">
+            <div class="channel-info" style="margin: 20px 0; display: flex; align-items: center; gap: 20px;">
+                <img id="channel-thumb" src="" alt="Channel" style="width: 80px; border-radius: 50%;">
+                <div>
+                    <h2 id="channel-title"></h2>
+                    <p id="channel-desc"></p>
+                </div>
+            </div>
+
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <h3>Subscribers</h3>
+                    <div class="value" id="kpi-subs">-</div>
+                </div>
+                <div class="kpi-card">
+                    <h3>Total Views</h3>
+                    <div class="value" id="kpi-views">-</div>
+                </div>
+                <div class="kpi-card">
+                    <h3>Avg Views/Video</h3>
+                    <div class="value" id="kpi-avg-views">-</div>
+                </div>
+                <div class="kpi-card">
+                    <h3>Engagement Rate</h3>
+                    <div class="value" id="kpi-engagement">-</div>
+                </div>
+            </div>
+
+            <div class="charts-container">
+                <div class="chart-card">
+                    <canvas id="viewsChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <canvas id="engagementChart"></canvas>
+                </div>
+            </div>
+
+            <div id="recent-videos-container">
+                <h3>Recent Videos</h3>
+                <table class="videos-table">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Published</th>
+                            <th>Views</th>
+                            <th>Likes</th>
+                            <th>Comments</th>
+                        </tr>
+                    </thead>
+                    <tbody id="videos-list">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script src="js/dashboard.js?v=3"></script>
+</body>
+
+</html>

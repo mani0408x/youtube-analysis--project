@@ -1,0 +1,65 @@
+DEBUG: Configured DB URI using split fields. User: root
+Starting Flask server on http://localhost:5000
+ * Serving Flask app 'backend.app'
+ * Debug mode: on
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://127.0.0.1:5000
+Press CTRL+C to quit
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 672-347-935
+127.0.0.1 - - [27/Dec/2025 01:55:27] "GET / HTTP/1.1" 304 -
+127.0.0.1 - - [27/Dec/2025 01:55:27] "GET / HTTP/1.1" 304 -
+127.0.0.1 - - [27/Dec/2025 01:55:27] "GET /css/style.css HTTP/1.1" 304 -
+127.0.0.1 - - [27/Dec/2025 01:55:27] "GET /css/style.css HTTP/1.1" 304 -
+127.0.0.1 - - [27/Dec/2025 01:55:27] "GET /js/main.js HTTP/1.1" 304 -
+127.0.0.1 - - [27/Dec/2025 01:55:28] "GET /js/main.js HTTP/1.1" 304 -
+127.0.0.1 - - [27/Dec/2025 01:55:30] "GET /auth/login HTTP/1.1" 302 -
+127.0.0.1 - - [27/Dec/2025 01:55:34] "GET /auth/callback?state=edBwMLL783CKBV3eAWu1vBVm73olLf&code=4/0ATX87lP1BrV9nT2a-nVS-OG_FQ-sQfUhzOEpDbMfkwEPtqIFu5GuOK9XXkZ5mCgLe4bc3w&scope=email+profile+https://www.googleapis.com/auth/userinfo.email+openid+https://www.googleapis.com/auth/userinfo.profile&authuser=0&prompt=none HTTP/1.1" 302 -
+127.0.0.1 - - [27/Dec/2025 01:55:34] "GET / HTTP/1.1" 304 -
+127.0.0.1 - - [27/Dec/2025 01:55:34] "GET /css/style.css HTTP/1.1" 304 -
+127.0.0.1 - - [27/Dec/2025 01:55:34] "GET /js/main.js HTTP/1.1" 304 -
+127.0.0.1 - - [27/Dec/2025 01:55:38] "GET /auth/login HTTP/1.1" 302 -
+127.0.0.1 - - [27/Dec/2025 01:55:41] "GET /auth/callback?state=HdfX6p8edld8SipD7w75jx8SBRNb3r&code=4/0ATX87lP-rLH2OLlvhd8aYxz5pW_oBNyfMMOQzEzPiQx-iF-TyBe4RgZ5OpLsTY4Jb9cOiw&scope=email+profile+https://www.googleapis.com/auth/userinfo.email+https://www.googleapis.com/auth/userinfo.profile+openid&authuser=0&prompt=none HTTP/1.1" 302 -
+127.0.0.1 - - [27/Dec/2025 01:55:41] "GET / HTTP/1.1" 304 -
+127.0.0.1 - - [27/Dec/2025 01:55:41] "GET /css/style.css HTTP/1.1" 304 -
+127.0.0.1 - - [27/Dec/2025 01:55:41] "GET /js/main.js HTTP/1.1" 304 -
+127.0.0.1 - - [27/Dec/2025 01:55:49] "GET /auth/login HTTP/1.1" 302 -
+127.0.0.1 - - [27/Dec/2025 01:55:52] "GET /auth/callback?state=1NCpTZzaXEMxCiCMs5m5vurK9wLWbu&code=4/0ATX87lMGTH0cNIKzO8Sc7wJHNK_RG1jXp92M8jv3KZyyCyvL8eHTzv9Q2SwDxkduwMmZdw&scope=email+profile+https://www.googleapis.com/auth/userinfo.email+https://www.googleapis.com/auth/userinfo.profile+openid&authuser=0&prompt=none HTTP/1.1" 302 -
+127.0.0.1 - - [27/Dec/2025 01:55:52] "GET / HTTP/1.1" 304 -
+127.0.0.1 - - [27/Dec/2025 01:55:53] "GET /css/style.css HTTP/1.1" 304 -
+127.0.0.1 - - [27/Dec/2025 01:55:53] "GET /js/main.js HTTP/1.1" 304 -
+127.0.0.1 - - [27/Dec/2025 01:56:14] "GET / HTTP/1.1" 304 -
+127.0.0.1 - - [27/Dec/2025 01:56:14] "GET / HTTP/1.1" 304 -
+127.0.0.1 - - [27/Dec/2025 01:56:14] "GET /css/style.css HTTP/1.1" 304 -
+127.0.0.1 - - [27/Dec/2025 01:56:14] "GET /js/main.js HTTP/1.1" 304 -
+127.0.0.1 - - [27/Dec/2025 01:56:15] "GET /css/style.css HTTP/1.1" 304 -
+127.0.0.1 - - [27/Dec/2025 01:56:15] "GET /js/main.js HTTP/1.1" 304 -
+127.0.0.1 - - [27/Dec/2025 01:56:16] "GET /auth/login HTTP/1.1" 302 -
+127.0.0.1 - - [27/Dec/2025 01:56:18] "GET /auth/login HTTP/1.1" 302 -
+127.0.0.1 - - [27/Dec/2025 01:56:19] "GET /auth/callback?state=8eAlgOslc1Rfi6ZbUv1tCjS239J86f&code=4/0ATX87lNBur1d6sucES6WlAkP-TXG6usy1K1RWTBVq1AAF--H2xzkDhOiA8DHfuidhVqwsQ&scope=email+profile+https://www.googleapis.com/auth/userinfo.email+https://www.googleapis.com/auth/userinfo.profile+openid&authuser=0&prompt=none HTTP/1.1" 302 -
+127.0.0.1 - - [27/Dec/2025 01:56:21] "GET /auth/callback?state=no0yIRNd82O2YK5mRfsAao20LlVotq&code=4/0ATX87lM1wRRMO6KltrAiKhul6g_ev0XhQtUCvq34qChyXPnR-nh0aR79OuLfF68RSfT8Uw&scope=email+profile+https://www.googleapis.com/auth/userinfo.email+https://www.googleapis.com/auth/userinfo.profile+openid&authuser=0&prompt=none HTTP/1.1" 302 -
+127.0.0.1 - - [27/Dec/2025 01:56:21] "GET / HTTP/1.1" 304 -
+127.0.0.1 - - [27/Dec/2025 01:56:21] "GET /css/style.css HTTP/1.1" 304 -
+127.0.0.1 - - [27/Dec/2025 01:56:21] "GET /js/main.js HTTP/1.1" 304 -
+127.0.0.1 - - [27/Dec/2025 01:56:33] "GET /auth/login HTTP/1.1" 302 -
+127.0.0.1 - - [27/Dec/2025 01:56:36] "GET /auth/callback?state=aOWewczd5bTZvsmSrfQ47xFzSSqbyi&code=4/0ATX87lNjNLNhR45nkRkFF2TzyUpyFjCq7dpWZrowU4ZRwuHezInrPUepKqnYOLr0lnfTBA&scope=email+profile+https://www.googleapis.com/auth/userinfo.profile+openid+https://www.googleapis.com/auth/userinfo.email&authuser=0&prompt=none HTTP/1.1" 302 -
+127.0.0.1 - - [27/Dec/2025 01:56:36] "GET / HTTP/1.1" 304 -
+127.0.0.1 - - [27/Dec/2025 01:56:37] "GET /css/style.css HTTP/1.1" 304 -
+127.0.0.1 - - [27/Dec/2025 01:56:37] "GET /js/main.js HTTP/1.1" 304 -
+ * Detected change in 'C:\\Users\\asus\\infosys project\\backend\\routes\\auth.py', reloading
+DEBUG: Configured DB URI using split fields. User: root
+Starting Flask server on http://localhost:5000
+DEBUG: Original redirect_uri: http://localhost:5000/auth/callback
+DEBUG: GOOGLE_CLIENT_ID loaded: True
+DEBUG: Original redirect_uri: http://localhost:5000/auth/callback
+DEBUG: GOOGLE_CLIENT_ID loaded: True
+DEBUG: Original redirect_uri: http://localhost:5000/auth/callback
+DEBUG: GOOGLE_CLIENT_ID loaded: True
+DEBUG: Original redirect_uri: http://localhost:5000/auth/callback
+DEBUG: GOOGLE_CLIENT_ID loaded: True
+DEBUG: Original redirect_uri: http://localhost:5000/auth/callback
+DEBUG: GOOGLE_CLIENT_ID loaded: True
+DEBUG: Original redirect_uri: http://localhost:5000/auth/callback
+DEBUG: GOOGLE_CLIENT_ID loaded: True
+ * Restarting with stat

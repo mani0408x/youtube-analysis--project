@@ -1,0 +1,32 @@
+
+> youtube-analytics-compat@1.0.0 db:init
+> python init_db.py
+
+DEBUG: Fallback to DATABASE_URI. Value present: False
+CRITICAL: SQLALCHEMY_DATABASE_URI is None!
+Env vars check - DB_USER: None, DB_NAME: youtube_analytics, DATABASE_URI: None
+Traceback (most recent call last):
+  File "C:\Users\asus\infosys project\init_db.py", line 1, in <module>
+    from backend.app import create_app
+  File "C:\Users\asus\infosys project\backend\app.py", line 2, in <module>
+    from backend.extensions import db
+  File "C:\Users\asus\infosys project\backend\extensions.py", line 1, in <module>
+    from flask_sqlalchemy import SQLAlchemy
+  File "C:\Users\asus\AppData\Roaming\Python\Python312\site-packages\flask_sqlalchemy\__init__.py", line 5, in <module>
+    from .extension import SQLAlchemy
+  File "C:\Users\asus\AppData\Roaming\Python\Python312\site-packages\flask_sqlalchemy\extension.py", line 13, in <module>
+    from flask import abort
+  File "C:\Users\asus\AppData\Roaming\Python\Python312\site-packages\flask\__init__.py", line 6, in <module>
+    from .app import Flask as Flask
+  File "C:\Users\asus\AppData\Roaming\Python\Python312\site-packages\flask\app.py", line 43, in <module>
+    from .sansio.app import App
+  File "C:\Users\asus\AppData\Roaming\Python\Python312\site-packages\flask\sansio\app.py", line 28, in <module>
+    from ..logging import create_logger
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 991, in exec_module
+  File "<frozen importlib._bootstrap_external>", line 1087, in get_code
+  File "<frozen importlib._bootstrap_external>", line 1186, in get_data
+KeyboardInterrupt
+Terminate batch job (Y/N)? Terminate batch job (Y/N)? 

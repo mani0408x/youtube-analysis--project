@@ -1,0 +1,8 @@
+Python: C:\Users\asus\infosys project\venv\Scripts\python.exe
+CWD: C:\Users\asus\infosys project
+Loading dotenv...
+DB_USER: root
+DATABASE_URI: None
+Flask version: 3.0.0
+SQLAlchemy imported
+PyMySQL imported

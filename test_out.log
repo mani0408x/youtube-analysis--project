@@ -1,0 +1,10 @@
+Python: C:\Users\asus\infosys project\venv\Scripts\python.exe
+CWD: C:\Users\asus\infosys project
+Loading dotenv...
+DB_USER: root
+DATABASE_URI: None
+C:\Users\asus\infosys project\test_env.py:16: DeprecationWarning: The '__version__' attribute is deprecated and will be removed in Flask 3.1. Use feature detection or 'importlib.metadata.version("flask")' instead.
+  print(f"Flask version: {flask.__version__}")
+Flask version: 3.0.0
+SQLAlchemy imported
+PyMySQL imported

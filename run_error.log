@@ -1,0 +1,9 @@
+Traceback (most recent call last):
+  File "C:\Users\asus\infosys project\run.py", line 7, in <module>
+    app = create_app()
+          ^^^^^^^^^^^^
+  File "C:\Users\asus\infosys project\backend\app.py", line 19, in create_app
+    db.init_app(app)
+  File "C:\Users\asus\infosys project\venv\Lib\site-packages\flask_sqlalchemy\extension.py", line 355, in init_app
+    raise RuntimeError(
+RuntimeError: Either 'SQLALCHEMY_DATABASE_URI' or 'SQLALCHEMY_BINDS' must be set.
