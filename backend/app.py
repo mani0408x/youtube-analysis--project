@@ -1,5 +1,5 @@
 from backend.config import Config
-from backend.extensions import db
+from backend.extensions import db, init_firebase
 from backend import models # Ensure models are loaded before create_all
 from flask import send_from_directory, Flask
 
@@ -16,6 +16,7 @@ def create_app(config_class=Config):
         return send_from_directory(app.static_folder, 'dashboard.html')
 
     # Initialize extensions
+    init_firebase()
     db.init_app(app)
 
     with app.app_context():

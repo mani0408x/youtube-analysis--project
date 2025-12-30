@@ -1,9 +1,12 @@
 from flask import Blueprint, jsonify, request, current_app
 from backend.services.youtube_service import get_channel_details, get_channel_videos
-from backend.models import Channel, Video, db
-from datetime import datetime
+from backend.services.analytics_service import calculate_earnings, segment_videos, mock_historical_data, determine_best_upload_time
+from backend.models import Channel, Video, DailyChannelStats, db
+from datetime import datetime, date
 import pandas as pd
 import math
+
+# ... (sanitize helper remains) ...
 
 def sanitize_for_json(data):
     if isinstance(data, dict):
@@ -15,8 +18,6 @@ def sanitize_for_json(data):
             return 0
         return data
     return data
-
-
 
 api_bp = Blueprint('api', __name__, url_prefix='/api')
 
@@ -41,6 +42,19 @@ def process_channel_analysis(channel_id):
         channel.last_updated = datetime.utcnow()
         
         db.session.add(channel)
+        
+        # 2b. Store Daily Stats (Snapshot)
+        today = date.today()
+        daily_stats = DailyChannelStats.query.filter_by(channel_id=channel_id, date=today).first()
+        if not daily_stats:
+            daily_stats = DailyChannelStats(channel_id=channel_id, date=today)
+            
+        daily_stats.subscribers = channel.subscriber_count
+        daily_stats.views = channel.view_count
+        daily_stats.video_count = channel.video_count
+        daily_stats.earnings_est = calculate_earnings(int(channel.view_count))
+        
+        db.session.add(daily_stats)
         db.session.commit()
         
         # 3. Fetch Videos
@@ -48,6 +62,7 @@ def process_channel_analysis(channel_id):
         
         processed_videos = []
         for v_data in videos_data:
+            # ... (Video Logic Same) ...
             video = Video.query.get(v_data['id'])
             if not video:
                 video = Video(id=v_data['id'])
@@ -59,48 +74,63 @@ def process_channel_analysis(channel_id):
             video.view_count = v_data['view_count']
             video.like_count = v_data['like_count']
             video.comment_count = v_data['comment_count']
-            video.last_updated = datetime.utcnow()
             
             db.session.add(video)
-            processed_videos.append({
+            video_dict = {
                 'title': video.title,
-                'views': video.view_count,
-                'likes': video.like_count,
-                'comments': video.comment_count,
                 'published_at': video.published_at.isoformat(),
+                'view_count': int(video.view_count),
+                'like_count': int(video.like_count),
+                'comment_count': int(video.comment_count),
                 'duration': video.duration
-            })
+            }
+            processed_videos.append(video_dict)
             
         db.session.commit()
         
-        # 4. Perform Analytics (Pandas)
-        df = pd.DataFrame(processed_videos)
+        # 4. Perform Analytics
+        segmented = segment_videos(processed_videos)
+        estimated_earnings = calculate_earnings(int(channel.view_count))
         
+        # New Phase 3: Growth & Strategy
+        # Use mock data for now to show the feature capabilities immediately
+        growth_trends = mock_historical_data(int(channel.view_count), int(channel.subscriber_count))
+        upload_strategy = determine_best_upload_time(processed_videos)
+
+        # Basic KPI with Pandas
+        df = pd.DataFrame(processed_videos)
         if not df.empty:
-            avg_views = df['views'].mean()
-            if pd.isna(avg_views): avg_views = 0
-
-            # Prevent division by zero: replace 0 views with 1 for calculation, 
-            # then forcibly set engagement to 0 where views were 0 (if needed, but 0/1 is 0).
-            # If likes>0 and views=0, 0/1 preserves finite value.
-            safe_views = df['views'].replace(0, 1)
-            engagement_rate = ((df['likes'] + df['comments']) / safe_views).mean() * 100
-            if pd.isna(engagement_rate): engagement_rate = 0
-
-            top_video = df.loc[df['views'].idxmax()].to_dict()
+            avg_views = df['view_count'].mean()
+            safe_views = df['view_count'].replace(0, 1)
+            engagement_rate = ((df['like_count'] + df['comment_count']) / safe_views).mean() * 100
+             # Use service result for top video
+            top_video_kpi = segmented['top_views'][0] if segmented['top_views'] else {}
         else:
             avg_views = 0
             engagement_rate = 0
-            top_video = {}
+            top_video_kpi = {}
 
         return sanitize_for_json({
             'channel': channel_data,
             'kpis': {
                 'avg_views': round(float(avg_views), 2),
                 'engagement_rate': round(float(engagement_rate), 2),
-                'top_video': top_video
+                'estimated_earnings': estimated_earnings,
+                'top_video': top_video_kpi
             },
-            'videos': processed_videos
+            'segments': segmented,
+            'growth': growth_trends,
+            'strategy': upload_strategy, 
+            'videos': [
+                {
+                    'title': v['title'],
+                    'views': v['view_count'],
+                    'likes': v['like_count'],
+                    'comments': v['comment_count'],
+                    'published_at': v['published_at'],
+                    'duration': v['duration']
+                } for v in processed_videos
+            ]
         })
     except Exception as e:
         current_app.logger.error(f"Error processing channel {channel_id}: {str(e)}")
@@ -155,6 +185,40 @@ def compare_channels():
         'results': results
     })
     
+@api_bp.route('/ai/generate', methods=['POST'])
+def generate_ai_content():
+    data = request.json
+    action = data.get('action') # 'ideas' or 'script'
+    
+    if not action:
+        return jsonify({'error': 'Action is required'}), 400
+        
+    try:
+        if action == 'ideas':
+            # Needs 'topic' and 'channel_name' (optional)
+            from backend.services.ai_service import generate_video_ideas
+            topic = data.get('topic', 'YouTube Growth')
+            channel_name = data.get('channel_name', 'YouTuber')
+            result = generate_video_ideas(topic, channel_name)
+            return jsonify({'result': result})
+            
+        elif action == 'script':
+            # Needs 'title' and 'tone'
+            from backend.services.ai_service import generate_script
+            title = data.get('title')
+            tone = data.get('tone', 'casual')
+            if not title:
+                return jsonify({'error': 'Title is required for script generation'}), 400
+            result = generate_script(title, tone)
+            return jsonify({'result': result})
+            
+        else:
+            return jsonify({'error': 'Invalid action'}), 400
+            
+    except Exception as e:
+        current_app.logger.error(f"AI Generation Error: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
 @api_bp.route('/channel/<channel_id>/stats')
 def get_stats(channel_id):
     # Retrieve from DB for dashboard verify

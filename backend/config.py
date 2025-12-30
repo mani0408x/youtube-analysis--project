@@ -3,7 +3,14 @@ from dotenv import load_dotenv
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 # Loading .env from project root (one level up from backend)
-load_dotenv(os.path.join(basedir, '..', '.env'))
+dotenv_path = os.path.join(basedir, '..', '.env')
+
+if not os.path.exists(dotenv_path):
+    # Try finding it in current working directory if running from root
+    dotenv_path = os.path.join(os.getcwd(), '.env')
+
+print(f"DEBUG: Loading .env from {dotenv_path}, Exists: {os.path.exists(dotenv_path)}")
+load_dotenv(dotenv_path)
 
 import urllib.parse
 

@@ -10,98 +10,195 @@
 </head>
 
 <body>
-    <div class="container">
-        <div class="dashboard-header">
-            <h2>Analytics Dashboard</h2>
-            <div class="user-info" id="user-info">
-                <!-- User details injected here -->
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fab fa-youtube"></i> AnalyticsPro
             </div>
-            <a href="/auth/logout" class="btn-logout">Logout</a>
-        </div>
+            <nav class="nav-links">
+                <a href="#" class="nav-item active"><i class="fas fa-home"></i> Overview</a>
+                <a href="#" class="nav-item"><i class="fas fa-chart-line"></i> Analytics</a>
+                <a href="#" class="nav-item"><i class="fas fa-video"></i> Videos</a>
+                <a href="#" class="nav-item"><i class="fas fa-cog"></i> Settings</a>
+            </nav>
+            <div class="user-profile" id="user-profile-area">
+                <!-- Injected via JS -->
+                <div class="skeleton-circle" style="width:40px;height:40px;"></div>
+            </div>
+        </aside>
 
-        <div class="search-bar">
-            <div class="input-group" id="channel-inputs-container">
-                <input type="text" id="channel-id-input" placeholder="Enter Channel ID (e.g., UC...)">
-                <!-- Additional inputs will be injected here -->
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <header class="top-bar">
+                <div class="search-container">
+                    <i class="fas fa-search" style="color: var(--text-muted);"></i>
+                    <div id="channel-inputs-container" style="flex:1; display:flex;">
+                        <input type="text" id="channel-id-input" placeholder="Paste Channel ID to Analyze...">
+                    </div>
+                </div>
+                <div class="actions" style="display:flex; gap:10px; align-items:center;">
+                    <div class="toggle-container" style="display:flex; align-items:center; gap:8px;">
+                        <span style="font-size:0.8rem; color:var(--text-secondary);">Compare</span>
+                        <label class="switch">
+                            <input type="checkbox" id="compare-mode-toggle">
+                            <span class="slider round"></span>
+                        </label>
+                        <div id="compare-count-wrapper" style="display:none;">
+                            <input type="number" id="compare-count" min="2" max="5" value="2" class="glass-input-sm">
+                        </div>
+                    </div>
+                    <button id="analyze-btn" class="btn-primary">Analyze</button>
+                    <button id="logout-btn" class="btn-ghost"
+                        style="color: var(--text-muted); background:none; border:none; cursor:pointer;"><i
+                            class="fas fa-sign-out-alt"></i></button>
+                </div>
+            </header>
+
+            <!-- Loading State -->
+            <div id="loading" style="display:none; text-align: center; padding: 50px;">
+                <div class="loader"></div>
+                <p style="color: var(--text-secondary); margin-top:15px;">Crunching the numbers...</p>
             </div>
-            <div class="controls">
-                <button id="analyze-btn">Analyze</button>
-                <div class="toggle-container">
-                    <label class="switch">
-                        <input type="checkbox" id="compare-mode-toggle">
-                        <span class="slider round"></span>
-                    </label>
-                    <span style="color: var(--text-secondary); font-size: 0.9rem;">Compare Mode</span>
-                    <div id="compare-count-wrapper" style="display:none; margin-left: 10px;">
-                        <input type="number" id="compare-count" min="2" max="5" value="2"
-                            style="width: 50px; padding: 5px;">
-                        <span style="color: var(--text-secondary); font-size: 0.8rem;">Channels</span>
+
+            <!-- Dashboard Content -->
+            <div id="results-area" style="display:none;">
+                <!-- Channel Header Card -->
+                <div class="glass-card"
+                    style="margin-bottom: var(--spacing-md); display:flex; align-items:center; gap:20px;">
+                    <img id="channel-thumb" src="" alt=""
+                        style="width:80px; height:80px; border-radius:50%; border: 3px solid rgba(255,255,255,0.1);">
+                    <div>
+                        <h2 id="channel-title" style="margin-bottom:5px;">Channel Name</h2>
+                        <p id="channel-desc" style="color:var(--text-secondary); font-size:0.9rem;">Description...</p>
+                    </div>
+                </div>
+
+                <!-- KPI Grid -->
+                <div class="dashboard-grid">
+                    <div class="glass-card kpi-card">
+                        <h3>Subscribers</h3>
+                        <div class="kpi-value" id="kpi-subs">-</div>
+                        <div class="kpi-trend trend-up"><i class="fas fa-users"></i> Total Audience</div>
+                    </div>
+                    <div class="glass-card kpi-card">
+                        <h3>Total Views</h3>
+                        <div class="kpi-value" id="kpi-views">-</div>
+                        <div class="kpi-trend"><i class="fas fa-eye"></i> Lifetime</div>
+                    </div>
+                    <div class="glass-card kpi-card">
+                        <h3>Engagement Rate</h3>
+                        <div class="kpi-value" id="kpi-engagement">-</div>
+                        <div class="kpi-trend trend-up" id="engagement-trend-label">High Performance</div>
+                    </div>
+                    <div class="glass-card kpi-card">
+                        <h3>Est. Earnings (CPM $2)</h3>
+                        <div class="kpi-value" id="kpi-earnings">-</div>
+                        <div class="kpi-trend"><i class="fas fa-dollar-sign"></i> Lifetime Est.</div>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="dashboard-grid" style="grid-template-columns: 2fr 1fr;">
+                    <div class="glass-card">
+                        <canvas id="viewsChart"></canvas>
+                    </div>
+                    <div class="glass-card">
+                        <canvas id="engagementChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Phase 3: Advanced Analytics -->
+                <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr;">
+                    <div class="glass-card">
+                        <h3 style="margin-bottom:10px;">Growth Trends (15 Days)</h3>
+                        <canvas id="growthChart"></canvas>
+                    </div>
+                    <div class="glass-card">
+                        <h3 style="margin-bottom:10px;">Best Upload Time</h3>
+                        <canvas id="uploadStrategyChart"></canvas>
+                        <p id="best-upload-day"
+                            style="margin-top:10px; color:var(--success); font-weight:bold; text-align:center;"></p>
+                    </div>
+                </div>
+
+                <!-- Top Videos Table -->
+                <div class="glass-card">
+                    <h3 style="margin-bottom: var(--spacing-sm);">Top Performing Videos</h3>
+                    <div class="table-container">
+                        <table class="modern-table">
+                            <thead>
+                                <tr>
+                                    <th>Video Title</th>
+                                    <th>Published</th>
+                                    <th>Views</th>
+                                    <th>Engagement</th>
+                                </tr>
+                            </thead>
+                            <tbody id="videos-list">
+                                <!-- JS Injection -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Phase 4: AI Studio -->
+                <div class="glass-card"
+                    style="margin-top: var(--spacing-md); border-top: 2px solid var(--gradient-primary);">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+                        <h2 class="gradient-text"><i class="fas fa-magic"></i> AI Creative Studio</h2>
+                        <div class="tabs" style="display:flex; gap:10px;">
+                            <button id="tab-ideas" class="btn-primary" style="font-size:0.9rem; padding:8px 16px;">Idea
+                                Gen</button>
+                            <button id="tab-script" class="btn-ghost"
+                                style="font-size:0.9rem; padding:8px 16px; color:var(--text-secondary); border:1px solid var(--glass-border); border-radius:50px; background:transparent; cursor:pointer;">Script
+                                Writer</button>
+                        </div>
+                    </div>
+
+                    <!-- Idea Generator UI -->
+                    <div id="ai-ideas-panel">
+                        <div style="display:flex; gap:10px; margin-bottom:20px;">
+                            <input type="text" id="ai-topic-input" class="glass-input"
+                                placeholder="Enter a topic (e.g., 'Minecraft', 'Finance', 'Vlog')..."
+                                style="flex:1; padding:12px; border-radius:10px; border:var(--glass-border); background:rgba(0,0,0,0.2); color:white;">
+                            <button id="ai-generate-ideas-btn" class="btn-primary"><i class="fas fa-lightbulb"></i>
+                                Brainstorm</button>
+                        </div>
+                        <div id="ai-ideas-results"
+                            style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:15px;">
+                            <!-- Ideas injected here -->
+                        </div>
+                    </div>
+
+                    <!-- Script Writer UI (Hidden by default) -->
+                    <div id="ai-script-panel" style="display:none;">
+                        <div style="display:flex; gap:10px; margin-bottom:20px;">
+                            <input type="text" id="ai-script-title" class="glass-input"
+                                placeholder="Paste Video Title here..."
+                                style="flex:2; padding:12px; border-radius:10px; border:var(--glass-border); background:rgba(0,0,0,0.2); color:white;">
+                            <select id="ai-script-tone"
+                                style="padding:12px; border-radius:10px; border:var(--glass-border); background:rgba(0,0,0,0.2); color:white;">
+                                <option value="exciting">Exciting</option>
+                                <option value="professional">Professional</option>
+                                <option value="funny">Funny</option>
+                                <option value="dramatic">Dramatic</option>
+                            </select>
+                            <button id="ai-generate-script-btn" class="btn-primary"><i class="fas fa-pen-fancy"></i>
+                                Write</button>
+                        </div>
+                        <textarea id="ai-script-output" readonly placeholder="AI generated script will appear here..."
+                            style="width:100%; height:300px; background:rgba(0,0,0,0.3); border:var(--glass-border); border-radius:10px; color:var(--text-secondary); padding:20px; font-family:monospace; resize:vertical;"></textarea>
                     </div>
                 </div>
             </div>
-        </div>
-
-        <div id="loading" style="display:none; text-align: center; margin: 40px auto;">
-            <span class="loader"></span>
-            <p style="color: var(--text-secondary); margin-top: 10px;">Analyzing Channel Data...</p>
-        </div>
-
-        <div id="results-area" style="display:none;">
-            <div class="channel-info" style="margin: 20px 0; display: flex; align-items: center; gap: 20px;">
-                <img id="channel-thumb" src="" alt="Channel" style="width: 80px; border-radius: 50%;">
-                <div>
-                    <h2 id="channel-title"></h2>
-                    <p id="channel-desc"></p>
-                </div>
-            </div>
-
-            <div class="kpi-grid">
-                <div class="kpi-card">
-                    <h3>Subscribers</h3>
-                    <div class="value" id="kpi-subs">-</div>
-                </div>
-                <div class="kpi-card">
-                    <h3>Total Views</h3>
-                    <div class="value" id="kpi-views">-</div>
-                </div>
-                <div class="kpi-card">
-                    <h3>Avg Views/Video</h3>
-                    <div class="value" id="kpi-avg-views">-</div>
-                </div>
-                <div class="kpi-card">
-                    <h3>Engagement Rate</h3>
-                    <div class="value" id="kpi-engagement">-</div>
-                </div>
-            </div>
-
-            <div class="charts-container">
-                <div class="chart-card">
-                    <canvas id="viewsChart"></canvas>
-                </div>
-                <div class="chart-card">
-                    <canvas id="engagementChart"></canvas>
-                </div>
-            </div>
-
-            <div id="recent-videos-container">
-                <h3>Recent Videos</h3>
-                <table class="videos-table">
-                    <thead>
-                        <tr>
-                            <th>Title</th>
-                            <th>Published</th>
-                            <th>Views</th>
-                            <th>Likes</th>
-                            <th>Comments</th>
-                        </tr>
-                    </thead>
-                    <tbody id="videos-list">
-                    </tbody>
-                </table>
-            </div>
-        </div>
+        </main>
     </div>
-    <script src="js/dashboard.js?v=3"></script>
+
+    <!-- Firebase SDKs (Modular) -->
+    <script type="module" src="js/auth.js"></script>
+    <script type="module" src="js/dashboard.js"></script>
 </body>
 
 </html>

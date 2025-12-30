@@ -1,88 +1,107 @@
-from flask import Blueprint, redirect, url_for, session, current_app, jsonify
-from authlib.integrations.flask_client import OAuth
+from flask import Blueprint, request, jsonify, g
+from firebase_admin import auth
 from backend.models import User, db
-from backend.extensions import db as _db # Access to db instance
+from functools import wraps
+from datetime import datetime
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
-oauth = OAuth()
 
+# No-op for compatibility with app.py's import
 def init_oauth(app):
-    oauth.init_app(app)
-    oauth.register(
-        name='google',
-        client_id=app.config['GOOGLE_CLIENT_ID'],
-        client_secret=app.config['GOOGLE_CLIENT_SECRET'],
-        access_token_url='https://accounts.google.com/o/oauth2/token',
-        access_token_params=None,
-        authorize_url='https://accounts.google.com/o/oauth2/auth',
-        authorize_params=None,
-        api_base_url='https://www.googleapis.com/oauth2/v1/',
-        client_kwargs={'scope': 'openid email profile', 'prompt': 'select_account'},
-        jwks_uri='https://www.googleapis.com/oauth2/v3/certs'
-    )
+    pass
 
-@auth_bp.route('/login')
-def login():
-    redirect_uri = url_for('auth.callback', _external=True)
-    
-    with open('auth_debug.log', 'a') as f:
-        f.write(f"\n--- Login Attempt ---\n")
-        f.write(f"Initial generated URI: {redirect_uri}\n")
-    
-    # Ensure consistency: Force localhost if currently 127.0.0.1
-    if '127.0.0.1' in redirect_uri:
-        redirect_uri = redirect_uri.replace('127.0.0.1', 'localhost')
-        with open('auth_debug.log', 'a') as f:
-            f.write(f"Modified URI (forced localhost): {redirect_uri}\n")
-            
-    return oauth.google.authorize_redirect(redirect_uri)
-
-@auth_bp.route('/callback')
-def callback():
+def verify_token(id_token):
     try:
-        token = oauth.google.authorize_access_token()
-        resp = oauth.google.get('userinfo')
-        user_info = resp.json()
-        
-        with open('auth_debug.log', 'a') as f:
-            f.write(f"Callback successful. User: {user_info.get('email')}\n")
-        
-        user = User.query.filter_by(google_id=user_info['id']).first()
-        if not user:
-            user = User(
-                google_id=user_info['id'],
-                email=user_info['email'],
-                name=user_info['name'],
-                avatar=user_info.get('picture')
-            )
-            db.session.add(user)
-            db.session.commit()
-        
-        session['user_id'] = user.id
-        return redirect('/dashboard') 
+        decoded_token = auth.verify_id_token(id_token)
+        return decoded_token
     except Exception as e:
-        with open('auth_debug.log', 'a') as f:
-            f.write(f"Callback ERROR: {str(e)}\n")
-            import traceback
-            traceback.print_exc(file=f)
-        return jsonify({'error': str(e)}), 400
+        print(f"Token Verification Error: {e}")
+        return None
 
-@auth_bp.route('/logout')
-def logout():
-    session.pop('user_id', None)
-    return redirect('/')
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        auth_header = request.headers.get('Authorization')
+        if not auth_header or not auth_header.startswith('Bearer '):
+            return jsonify({'error': 'Unauthorized', 'message': 'Missing Token'}), 401
+        
+        token = auth_header.split(' ')[1]
+        decoded = verify_token(token)
+        if not decoded:
+            return jsonify({'error': 'Unauthorized', 'message': 'Invalid Token'}), 401
+        
+        # Attach user to request context
+        uid = decoded['uid']
+        user = User.query.filter_by(firebase_uid=uid).first()
+        g.user = user
+        g.firebase_user = decoded
+        
+        return f(*args, **kwargs)
+    return decorated_function
 
-@auth_bp.route('/me')
-def curren_user():
-    if 'user_id' not in session:
-        return jsonify({'authenticated': False}), 401
+@auth_bp.route('/verify', methods=['POST'])
+def verify_user():
+    """
+    Verifies Firebase Token and syncs user to MySQL
+    """
+    data = request.json
+    token = data.get('token')
+    if not token:
+        return jsonify({'error': 'Token required'}), 400
+
+    decoded = verify_token(token)
+    if not decoded:
+        return jsonify({'error': 'Invalid Token'}), 401
+
+    uid = decoded['uid']
+    email = decoded.get('email')
+    name = decoded.get('name', 'User')
+    picture = decoded.get('picture')
+
+    # Sync User
+    user = User.query.filter_by(firebase_uid=uid).first()
+    if not user:
+        user = User(
+            firebase_uid=uid,
+            email=email,
+            name=name,
+            photo_url=picture
+        )
+        db.session.add(user)
+    else:
+        # Update info if changed
+        user.name = name
+        user.photo_url = picture
+        # Email can change in firebase, update it?
+        user.email = email
     
-    user = User.query.get(session['user_id'])
+    try:
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': 'Database Error', 'details': str(e)}), 500
+
     return jsonify({
-        'authenticated': True,
+        'status': 'success',
         'user': {
+            'id': user.id,
             'name': user.name,
             'email': user.email,
-            'avatar': user.avatar
+            'photo': user.photo_url
         }
     })
+
+@auth_bp.route('/me', methods=['GET'])
+@login_required
+def get_me():
+    if g.user:
+        return jsonify({
+            'authenticated': True,
+            'user': {
+                'id': g.user.id,
+                'name': g.user.name,
+                'email': g.user.email,
+                'photo': g.user.photo_url
+            }
+        })
+    return jsonify({'authenticated': False}), 401
