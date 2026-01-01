@@ -848,18 +848,96 @@ document.addEventListener('DOMContentLoaded', () => {
         charts['viewsChart'] = new Chart(ctxViews, {
             type: 'bar',
             data: {
-                labels: ['Avg Views', 'Avg Engagement'],
+                labels: ['Avg Views'],
                 datasets: results.map((res, idx) => ({
                     label: res.channel.title,
-                    data: [res.kpis.avg_views, res.kpis.engagement_rate * 1000], // Scale engagement for visibility
+                    data: [res.kpis.avg_views],
                     backgroundColor: idx === 0 ? 'rgba(54, 162, 235, 0.6)' : 'rgba(255, 99, 132, 0.6)'
                 }))
             },
             options: { responsive: true }
         });
 
-        // Hide others
-        document.getElementById('engagementChart').parentElement.style.display = 'none';
+        const ctxEng = document.getElementById('engagementChart').getContext('2d');
+
+        // Calculate Avg Likes and Comments from the videos array for better accuracy than just rate
+        const engagementData = results.map((res, idx) => {
+            const vids = res.videos || [];
+            if (vids.length === 0) return { title: res.channel.title, likes: 0, comments: 0 };
+
+            const totalLikes = vids.reduce((sum, v) => sum + (parseInt(v.likes || v.like_count) || 0), 0);
+            const totalComments = vids.reduce((sum, v) => sum + (parseInt(v.comments || v.comment_count) || 0), 0);
+
+            return {
+                title: res.channel.title,
+                avgLikes: Math.round(totalLikes / vids.length),
+                avgComments: Math.round(totalComments / vids.length),
+                color: idx === 0 ? 'rgba(54, 162, 235, 0.7)' : 'rgba(255, 99, 132, 0.7)',
+                borderColor: idx === 0 ? 'rgba(54, 162, 235, 1)' : 'rgba(255, 99, 132, 1)'
+            };
+        });
+
+        // 2. Engagement Comparison Chart (Bar)
+        const engContainer = document.getElementById('engagementChart').parentElement;
+        engContainer.querySelector('h3').innerText = "Likes & Comments Comparison"; // Update Title
+        engContainer.style.display = 'block';
+
+        charts['engagementChart'] = new Chart(ctxEng, {
+            type: 'bar',
+            data: {
+                labels: ['Avg Likes', 'Avg Comments'],
+                datasets: results.map((res, idx) => ({
+                    label: res.channel.title,
+                    data: [engagementData[idx].avgLikes, engagementData[idx].avgComments],
+                    backgroundColor: engagementData[idx].color,
+                    borderColor: engagementData[idx].borderColor,
+                    borderWidth: 1
+                }))
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: { display: false }, // Title now in H3
+                    legend: { position: 'bottom' }
+                },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+
+        // 3. Engagement Rate Comparison (Repurposing Growth Chart Slot)
+        const growthContainer = document.getElementById('growthChart').parentElement;
+        if (growthContainer) {
+            growthContainer.style.display = 'block'; // Unhide
+            growthContainer.querySelector('h3').innerText = "Engagement Rate Comparison"; // Rename
+
+            const ctxGrowth = document.getElementById('growthChart').getContext('2d');
+            charts['growthChart'] = new Chart(ctxGrowth, {
+                type: 'bar',
+                data: {
+                    labels: ['Engagement Rate (%)'],
+                    datasets: results.map((res, idx) => ({
+                        label: res.channel.title,
+                        data: [res.kpis.engagement_rate],
+                        backgroundColor: idx === 0 ? 'rgba(75, 192, 192, 0.6)' : 'rgba(153, 102, 255, 0.6)',
+                        borderColor: idx === 0 ? 'rgba(75, 192, 192, 1)' : 'rgba(153, 102, 255, 1)',
+                        borderWidth: 1
+                    }))
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
 
         // Hide Table
         document.querySelector('.table-container').parentElement.style.display = 'none';
