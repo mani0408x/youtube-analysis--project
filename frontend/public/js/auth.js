@@ -171,7 +171,7 @@ window.handleSignOut = () => {
     localStorage.removeItem('auth_token');
     localStorage.removeItem('user_info');
     google.accounts.id.disableAutoSelect();
-    window.location.href = '/login'; // Redirect to login
+    window.location.href = '/'; // Redirect to Landing Page
 };
 
 const logoutBtn = document.getElementById('logout-btn');

@@ -144,10 +144,32 @@ def process_channel_analysis(channel_id):
 @api_bp.route('/analyze', methods=['POST'])
 def analyze_channel():
     data = request.json
-    channel_id = data.get('channel_id')
+    channel_input = data.get('channel_id') # Can be ID or Name
     
-    if not channel_id:
-        return jsonify({'error': 'Channel ID is required'}), 400
+    if not channel_input:
+        return jsonify({'error': 'Channel Name or ID is required'}), 400
+
+    print(f"DEBUG: Received analyze request for: {channel_input}")
+    from backend.services.youtube_service import resolve_channel_input
+    resolved = resolve_channel_input(channel_input)
+    print(f"DEBUG: Resolved to: {resolved}")
+    
+    if not resolved:
+        print("DEBUG: Resolution failed.")
+        return jsonify({'error': 'Channel not found'}), 404
+        
+    # Check if we got a list (Ambiguity/Search Results) or String (Direct ID)
+    if isinstance(resolved, list):
+        # Automatically select the first/best match as per user request
+        if len(resolved) > 0:
+            channel_id = resolved[0]['id']
+        else:
+             return jsonify({'error': 'Channel not found'}), 404
+             
+        # Log or handled differently if we wanted logic for multiple options, 
+        # but user requested automatic fetch for name.
+    else:
+        channel_id = resolved
 
     result = process_channel_analysis(channel_id)
     if not result:
@@ -160,28 +182,47 @@ def analyze_channel():
 @api_bp.route('/compare', methods=['POST'])
 def compare_channels():
     data = request.get_json(silent=True) or {}
-    channel_ids = data.get('channel_ids')
+    inputs = data.get('channel_ids')
     
     # Backward compatibility or alternate input
-    if not channel_ids:
+    if not inputs:
         c1 = data.get('channel_id_1')
         c2 = data.get('channel_id_2')
         if c1 and c2:
-            channel_ids = [c1, c2]
+            inputs = [c1, c2]
     
-    if not channel_ids or not isinstance(channel_ids, list) or len(channel_ids) < 2:
-        return jsonify({'error': 'At least two Channel IDs are required'}), 400
+    if not inputs or not isinstance(inputs, list) or len(inputs) < 2:
+        return jsonify({'error': 'At least two Channel names/IDs are required'}), 400
         
-    results = []
+    from backend.services.youtube_service import resolve_channel_input
     
-    for cid in channel_ids:
-        if not cid: continue
-        res = process_channel_analysis(cid)
+    resolved_ids = []
+    
+    for idx, inp in enumerate(inputs):
+        if not inp: continue
+        res = resolve_channel_input(inp)
+        
         if not res:
-            return jsonify({'error': f'Channel ({cid}) not found'}), 404
-        if 'error' in res:
-            return jsonify(res), 500
-        results.append(res)
+             return jsonify({'error': f'Channel "{inp}" not found'}), 404
+             
+        if isinstance(res, list):
+            # Found multiple options, auto-select the first one
+            if len(res) > 0:
+                resolved_ids.append(res[0]['id'])
+            else:
+                 return jsonify({'error': f'Channel "{inp}" not found'}), 404
+        else:
+            resolved_ids.append(res)
+            
+    # All resolved to IDs
+    results = []
+    for cid in resolved_ids:
+        res_data = process_channel_analysis(cid)
+        if not res_data:
+             return jsonify({'error': f'Channel ({cid}) not found'}), 404
+        if 'error' in res_data:
+             return jsonify(res_data), 500
+        results.append(res_data)
 
     return jsonify({
         'results': results
@@ -299,4 +340,14 @@ def get_public_config():
     return jsonify({
         'google_client_id': current_app.config.get('GOOGLE_CLIENT_ID')
     })
+    
+@api_bp.route('/suggestions', methods=['GET'])
+def get_suggestions():
+    q = request.args.get('q')
+    if not q or len(q) < 2:
+        return jsonify([])
+        
+    from backend.services.youtube_service import search_channels
+    results = search_channels(q, limit=5)
+    return jsonify(results)
 

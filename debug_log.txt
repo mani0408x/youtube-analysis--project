@@ -1,12 +1,7 @@
-Traceback (most recent call last):
-  File "C:\Users\asus\OneDrive\Desktop\updated yt analysis\youtube-analysis--project\run.py", line 8, in <module>
-    app = create_app()
-          ^^^^^^^^^^^^
-  File "C:\Users\asus\OneDrive\Desktop\updated yt analysis\youtube-analysis--project\backend\app.py", line 31, in create_app
-    from backend.routes.auth import auth_bp, init_oauth
-  File "C:\Users\asus\OneDrive\Desktop\updated yt analysis\youtube-analysis--project\backend\routes\auth.py", line 6, in <module>
-    import jwt
-ModuleNotFoundError: No module named 'jwt'
-DEBUG: Loading .env from C:\Users\asus\OneDrive\Desktop\updated yt analysis\youtube-analysis--project\backend\..\.env, Exists: True
-DEBUG: Configured DB URI using split fields. User: root
-Server crashed: No module named 'jwt'
+Starting Log...
+API KEY Present: True
+API KEY Length: 39
+--- Testing resolve_channel_input('PewDiePie') ---
+Result Type: <class 'list'>
+Result: [{'id': 'UC-lHJZR3Gqxm24_Vd_AJ5Yw', 'title': 'PewDiePie', 'thumbnail': 'https://yt3.ggpht.com/vik8mAiwHQbXiFyKfZ3__p55_VBdGvwxPpuPJBBwdbF0PjJxikXhrP-C3nLQAMAxGNd_-xQCIg=s88-c-k-c0x00ffffff-no-rj', 'description': 'I make videos.', 'subscriber_count': 110000000}, {'id': 'UCydjdAtnuAHHmurM2MkstmQ', 'title': 'PewDiePie - Topic', 'thumbnail': 'https://yt3.ggpht.com/LjwKtxjHvm0Lh7iD3jRyAvfkdzgdx88Ywtvw-pNTSRcz5dTGXxcxYpPMlmF3QPIfj9FEnWci=s88-c-k-c0x00ffffff-no-rj', 'description': '', 'subscriber_count': 147000}, {'id': 'UC-wCq2niVDhBJTV-ZPUuzxQ', 'title': 'The PewDiePie Archive', 'thumbnail': 'https://yt3.ggpht.com/ytc/AIdro_lHS0uE625ohVC6_M8LOyK0P9tNBc0DyfNcA2hQF4pzDg=s88-c-k-c0x00ffffff-no-rj', 'description': "I am a channel that uploads deleted videos and clips of PewDiePie.  All videos are from PewDiePie and I do not take credit for the videos. PewDiePie himself said that he doesn't mind reuploads of his content in his Cold Ones interview.", 'subscriber_count': 26200}]
+Success! Found ID: UC-lHJZR3Gqxm24_Vd_AJ5Yw

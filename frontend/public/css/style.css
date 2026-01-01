@@ -220,7 +220,11 @@ html {
     padding: 15px 20px;
     border-radius: var(--radius-md);
     border: var(--glass-border);
+    border: var(--glass-border);
     backdrop-filter: blur(10px);
+    z-index: 1000;
+    position: relative;
+    /* Ensure stacking context */
 }
 
 /* New Input Styles */
@@ -254,6 +258,67 @@ html {
     padding: 10px 15px;
     border-radius: 4px;
     /* Slight radius but mostly rectangular */
+}
+
+/* Autocomplete Suggestions */
+.suggestions-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.suggestions-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: #1a1a1a;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    z-index: 2000;
+    max-height: 300px;
+    overflow-y: auto;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+    display: none;
+}
+
+.suggestion-item {
+    padding: 10px 15px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    transition: background 0.2s;
+}
+
+.suggestion-item:last-child {
+    border-bottom: none;
+}
+
+.suggestion-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.suggestion-item img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+}
+
+.suggestion-item div {
+    display: flex;
+    flex-direction: column;
+}
+
+.suggestion-item strong {
+    font-size: 0.9rem;
+    color: white;
+}
+
+.suggestion-item span {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
 }
 
 /* Force inputs container to strip gap */

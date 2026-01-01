@@ -3,6 +3,21 @@ async function getAuthToken() {
     return localStorage.getItem('auth_token');
 }
 
+window.addEventListener('error', function (e) {
+    console.error(e);
+    // Provide visual feedback if JS crashes
+    const overlay = document.createElement('div');
+    overlay.style.position = 'fixed';
+    overlay.style.bottom = '0';
+    overlay.style.right = '0';
+    overlay.style.padding = '20px';
+    overlay.style.background = 'red';
+    overlay.style.color = 'white';
+    overlay.style.zIndex = '99999';
+    overlay.innerText = 'JS Error: ' + e.message;
+    document.body.appendChild(overlay);
+});
+
 document.addEventListener('DOMContentLoaded', () => {
 
     // Check Auth State
@@ -156,30 +171,139 @@ document.addEventListener('DOMContentLoaded', () => {
     let isCompareMode = false;
     let charts = {};
 
-    // Helper to generate inputs - RECTANGULAR & BLACK
+    // Helper to generate inputs - RECTANGULAR & BLACK WITH SUGGESTIONS
+    function createInputWithSuggestions(id, placeholder, value) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'suggestions-wrapper';
+        wrapper.style.marginBottom = '10px';
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'glass-input';
+        input.placeholder = 'Enter YouTube Channel Name...';
+        input.setAttribute('autocomplete', 'off');
+        input.value = value;
+        input.style.width = '100%';
+        input.style.marginBottom = '0'; // Wrapper handles margin
+
+        const list = document.createElement('div');
+        list.className = 'suggestions-list';
+
+        wrapper.appendChild(input);
+        wrapper.appendChild(list);
+
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault(); // Prevent form submit if any
+                list.style.display = 'none'; // Hide suggestions
+                const analyzeBtn = document.getElementById('analyze-btn');
+                if (analyzeBtn) analyzeBtn.click();
+            }
+        });
+
+        // Autocomplete Logic
+        let timeout = null;
+
+        // Clear hidden ID on user typing
+        input.addEventListener('input', () => {
+            delete input.dataset.resolvedId;
+        });
+
+        input.addEventListener('input', () => {
+            const q = input.value.trim();
+            clearTimeout(timeout);
+
+            if (q.length < 1) {
+                list.style.display = 'none';
+                return;
+            }
+
+            timeout = setTimeout(async () => {
+                try {
+                    const res = await fetch(`/api/suggestions?q=${encodeURIComponent(q)}`);
+                    const suggestions = await res.json();
+
+                    if (suggestions.length > 0) {
+                        const formatSubs = (num) => {
+                            if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+                            if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+                            return num;
+                        };
+
+                        list.innerHTML = suggestions.map(s => `
+                            <div class="suggestion-item" data-id="${s.id}" data-title="${s.title.replace(/"/g, '&quot;')}">
+                                <img src="${s.thumbnail || 'https://via.placeholder.com/32'}" />
+                                <div>
+                                    <strong>${s.title}</strong>
+                                    <span style="color:var(--text-secondary); font-size:0.75rem;">${formatSubs(s.subscriber_count)} subscribers</span>
+                                </div>
+                            </div>
+                         `).join('');
+                        list.style.display = 'block';
+                        // Force visibility check
+
+                        // Click Handlers
+                        list.querySelectorAll('.suggestion-item').forEach(item => {
+                            item.addEventListener('click', (e) => {
+                                e.stopPropagation();
+
+                                // UPDATE: Show Title, Store ID
+                                input.value = item.getAttribute('data-title');
+                                input.dataset.resolvedId = item.getAttribute('data-id');
+
+                                list.style.display = 'none';
+
+                                // Auto-trigger analysis
+                                const analyzeBtn = document.getElementById('analyze-btn');
+                                if (analyzeBtn) analyzeBtn.click();
+                            });
+                        });
+
+                    } else {
+                        // Show "No results" gracefully
+                        list.innerHTML = `<div style="padding:10px 15px; color:var(--text-muted); font-size:0.9rem;">No channels found</div>`;
+                        list.style.display = 'block';
+                    }
+                } catch (e) {
+                    // Silent fail as per requirements (hide suggestions)
+                    list.style.display = 'none';
+                }
+            }, 300); // Debounce 300ms
+        });
+
+        // Close on blur (delayed to allow click)
+        // Or close on doc click
+        document.addEventListener('click', (e) => {
+            if (!wrapper.contains(e.target)) {
+                list.style.display = 'none';
+            }
+        });
+
+        return wrapper;
+    }
+
     function updateInputs() {
-        const currentVals = Array.from(inputsContainer.querySelectorAll('input')).map(i => i.value);
+        const inputs = inputsContainer.querySelectorAll('input');
+        const currentVals = Array.from(inputs).map(i => i.value);
         inputsContainer.innerHTML = ''; // Clear
 
-        // Always input 1
-        const input1 = document.createElement('input');
-        input1.type = 'text';
-        input1.id = 'channel-id-1';
-        input1.className = 'glass-input';
-        input1.placeholder = isCompareMode ? 'Channel ID 1' : 'Paste Channel ID...';
-        input1.value = currentVals[0] || '';
-        inputsContainer.appendChild(input1);
+        // Input 1
+        const w1 = createInputWithSuggestions(
+            'channel-id-1',
+            isCompareMode ? 'Name or ID (Channel 1)' : 'Enter Channel Name or ID...',
+            currentVals[0] || ''
+        );
+        inputsContainer.appendChild(w1);
 
         if (isCompareMode) {
             const count = parseInt(compareCountInput.value) || 2;
             for (let i = 2; i <= count; i++) {
-                const inp = document.createElement('input');
-                inp.type = 'text';
-                inp.placeholder = `Channel ID ${i}`;
-                inp.className = 'glass-input';
-                inp.value = currentVals[i - 1] || '';
-                inp.style.marginTop = '0px'; // CSS handles gap
-                inputsContainer.appendChild(inp);
+                const w = createInputWithSuggestions(
+                    `channel-id-${i}`,
+                    `Name or ID (Channel ${i})`,
+                    currentVals[i - 1] || ''
+                );
+                inputsContainer.appendChild(w);
             }
         }
     }
@@ -196,17 +320,95 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initial Input Setup
     updateInputs();
 
+    // Ambiguity Handling Helper
+    function showSelectionModal(options, callback) {
+        // Create a simple modal overlay
+        const overlay = document.createElement('div');
+        overlay.style.position = 'fixed';
+        overlay.style.top = '0';
+        overlay.style.left = '0';
+        overlay.style.width = '100vw';
+        overlay.style.height = '100vh';
+        overlay.style.background = 'rgba(0,0,0,0.85)';
+        overlay.style.zIndex = '9999';
+        overlay.style.display = 'flex';
+        overlay.style.alignItems = 'center';
+        overlay.style.justifyContent = 'center';
+
+        const card = document.createElement('div');
+        card.className = 'glass-card';
+        card.style.maxWidth = '500px';
+        card.style.width = '90%';
+        card.style.maxHeight = '80vh';
+        card.style.overflowY = 'auto';
+
+        card.innerHTML = `<h3 style="margin-bottom:15px; text-align:center;">Select Channel</h3><p style="text-align:center; color:var(--text-secondary); margin-bottom:20px;">Multiple channels found. Please select one:</p>`;
+
+        const list = document.createElement('div');
+        list.style.display = 'flex';
+        list.style.flexDirection = 'column';
+        list.style.gap = '10px';
+
+        options.forEach(opt => {
+            const item = document.createElement('div');
+            item.style.display = 'flex';
+            item.style.alignItems = 'center';
+            item.style.gap = '15px';
+            item.style.padding = '10px';
+            item.style.background = 'rgba(255,255,255,0.05)';
+            item.style.borderRadius = '8px';
+            item.style.cursor = 'pointer';
+            item.style.border = '1px solid transparent';
+
+            item.onmouseover = () => item.style.border = '1px solid var(--primary-color)';
+            item.onmouseout = () => item.style.border = '1px solid transparent';
+
+            item.innerHTML = `
+                <img src="${opt.thumbnail}" style="width:50px; height:50px; border-radius:50%;">
+                <div>
+                    <div style="font-weight:bold;">${opt.title}</div>
+                    <div style="font-size:0.8rem; color:var(--text-muted);">${opt.description ? opt.description.substring(0, 60) + '...' : 'No description'}</div>
+                </div>
+            `;
+
+            item.onclick = () => {
+                callback(opt.id);
+                document.body.removeChild(overlay);
+            };
+
+            list.appendChild(item);
+        });
+
+        // Cancel button
+        const cancel = document.createElement('button');
+        cancel.innerText = 'Cancel';
+        cancel.className = 'btn-ghost';
+        cancel.style.marginTop = '20px';
+        cancel.style.width = '100%';
+        cancel.onclick = () => document.body.removeChild(overlay);
+
+        card.appendChild(list);
+        card.appendChild(cancel);
+        overlay.appendChild(card);
+        document.body.appendChild(overlay);
+    }
+
     analyzeBtn.addEventListener('click', async () => {
         const inputs = inputsContainer.querySelectorAll('input');
-        const ids = Array.from(inputs).map(inp => inp.value.trim()).filter(val => val !== '');
+        // Capture specific inputs to update them easily later if ambiguity happens
+        const inputElements = Array.from(inputs);
 
-        if (ids.length === 0) return alert('Please enter a Channel ID');
-        if (isCompareMode && ids.length < 2) return alert('Please enter at least 2 Channel IDs for comparison');
+        // Use hidden ID if available (from suggestion selection), else use text value
+        const ids = inputElements.map(inp => inp.dataset.resolvedId || inp.value.trim()).filter(val => val !== '');
 
-        // Validation: Duplicates
+        if (ids.length === 0) return alert('Please enter a Channel Name or ID');
+        if (isCompareMode && ids.length < 2) return alert('Please enter at least 2 channels for comparison');
+
+        // Validation: Duplicates (skip for names as they might resolve differently, but good to warn if identical strings)
+        // Let's rely on backend resolution for strictness, but client-side strictness:
         const uniqueIds = new Set(ids);
         if (uniqueIds.size !== ids.length) {
-            return alert("Error: You cannot compare the same Channel ID with itself. Please enter distinct IDs.");
+            return alert("Please enter distinct Channel Names/IDs.");
         }
 
         loadingDiv.style.display = 'block';
@@ -228,6 +430,27 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             const data = await res.json();
+
+            // Handle Ambiguity (300)
+            if (res.status === 300 && data.ambiguous) {
+                loadingDiv.style.display = 'none';
+
+                // If comparison, we know which index caused it
+                // If single, it's just the one input
+
+                showSelectionModal(data.options, (selectedId) => {
+                    // Update the input with the RESOLVED ID
+                    if (isCompareMode && data.input_index !== undefined) {
+                        inputElements[data.input_index].value = selectedId;
+                    } else {
+                        inputElements[0].value = selectedId;
+                    }
+                    // Auto-click analyze again to proceed
+                    analyzeBtn.click();
+                });
+                return;
+            }
+
             if (!res.ok) throw new Error(data.error || 'Server error');
 
             loadingDiv.style.display = 'none';
@@ -298,6 +521,12 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     function renderDashboard(data) {
+        // Reset Comparison UI
+        const viewsChartCard = document.getElementById('viewsChart').parentElement;
+        if (viewsChartCard) viewsChartCard.style.display = 'block';
+        const compContainer = document.getElementById('comparison-charts-container');
+        if (compContainer) compContainer.style.display = 'none';
+
         // Update Channel Info
         // Note: We are using IDs like 'channel-thumb', 'kpi-subs' which are unique and exist in 'section-overview'
         const thumb = document.getElementById('channel-thumb');
@@ -321,8 +550,22 @@ document.addEventListener('DOMContentLoaded', () => {
             earningsEl.innerText = '$' + (data.kpis.estimated_earnings || 0).toLocaleString();
         }
 
+        // Show specific elements for single mode
+        const analyticsSection = document.getElementById('section-analytics');
+        if (analyticsSection) {
+            const h2 = analyticsSection.querySelector('h2');
+            if (h2) h2.style.display = 'block';
+        }
+        const stratChart = document.getElementById('uploadStrategyChart');
+        if (stratChart) stratChart.parentElement.style.display = 'block';
+        const engChart = document.getElementById('engagementChart');
+        if (engChart) engChart.parentElement.style.display = 'block';
+        document.querySelector('.table-container').parentElement.style.display = 'block';
+
+
         // Charts
         renderCharts([data.channel.title], [data.videos], data.growth, data.strategy);
+
 
         // Videos Table
         const tbody = document.getElementById('videos-list');
@@ -513,28 +756,23 @@ document.addEventListener('DOMContentLoaded', () => {
         // Comparison Header
         // We will repurpose the single-channel header card for the VS view
         // Comparison Header - Multi-Avatar Display
-        const infoArea = document.querySelector('#section-overview .channel-info-card');
+        const infoArea = document.querySelector('#section-overview .channel-header-card');
 
         if (infoArea) {
-            // Force container style for multi-avatar
+            // Force container style for multi-avatar horizontal layout
             infoArea.style.display = 'flex';
+            infoArea.style.flexDirection = 'row'; // Explicitly horizontal
             infoArea.style.alignItems = 'center';
             infoArea.style.justifyContent = 'center';
-            infoArea.style.gap = '20px';
-            infoArea.style.flexWrap = 'wrap';
+            infoArea.style.gap = '30px'; // Increased gap for better separation
+            infoArea.style.flexWrap = 'nowrap'; // Prevent wrapping to keep it horizontal
+            infoArea.style.overflowX = 'auto'; // scroll if too small (mobile safe)
 
             infoArea.innerHTML = results.map(res => `
-                <div class="comp-channel-header" style="text-align:center; display:flex; flex-direction:column; align-items:center; min-width: 140px;">
-                    <div style="position:relative;">
-                        <img src="${getAvatar(res.channel.thumbnail_url)}" style="width: 80px; height:80px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.2); box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
-                        <div style="position:absolute; bottom:0; right:0; background:var(--gradient-primary); width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:2px solid #000; font-size:0.7rem;">
-                            <i class="fas fa-check"></i>
-                        </div>
-                    </div>
-                    <h3 style="font-size:1.1rem; margin-top:10px; margin-bottom:2px;">${res.channel.title}</h3>
-                    <p style="color:var(--text-muted); font-size:0.9rem;">${parseInt(res.channel.subscriber_count).toLocaleString()} Subs</p>
+                <div class="comp-channel-header" style="text-align:center; min-width: 120px; flex-shrink: 0;">
+                    <h2 style="font-size:1.8rem; margin:0; font-weight:700; color: white;">${res.channel.title}</h2>
                 </div>
-            `).join('<div style="font-weight:900; font-size:1.5rem; color:var(--text-secondary); opacity:0.5;">VS</div>');
+            `).join('<div style="font-weight:900; font-size:1.5rem; font-style: italic; color:var(--text-secondary); margin: 0 15px;">VS</div>');
         }
 
         // KPI Comparison - Dynamic Rows
@@ -587,30 +825,17 @@ document.addEventListener('DOMContentLoaded', () => {
                      <h3 style="margin-bottom:10px;">Est. Earnings</h3>
                     ${createKpiRows('Earnings', r => '$' + r.kpis.estimated_earnings)}
                 </div>
-                
-                <div class="glass-card" style="grid-column: 1 / -1; text-align:center; padding: 20px;">
-                    <button id="go-deep-analytics-btn" class="btn-primary" style="padding:15px 40px; font-size:1.1rem;">
-                        <i class="fas fa-chart-pie"></i> Go to Deeper Analytics
-                    </button>
-                    <p style="color:var(--text-muted); margin-top:10px; font-size:0.9rem;">View detailed chart comparisons</p>
-                </div>
             `;
         }
 
-        // Attach Event to New CTA
-        setTimeout(() => {
-            const btn = document.getElementById('go-deep-analytics-btn');
-            if (btn) {
-                btn.addEventListener('click', () => {
-                    // Manually trigger tab switch logic
-                    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-                    // Find Analytics tab text
-                    const analyticsTab = Array.from(document.querySelectorAll('.nav-item')).find(n => n.innerText.includes('Analytics'));
-                    if (analyticsTab) analyticsTab.classList.add('active');
-                    showSection('section-analytics');
-                });
-            }
-        }, 100);
+        // Hide specific analytics elements for Comparison Mode
+        const analyticsSection = document.getElementById('section-analytics');
+        if (analyticsSection) {
+            const h2 = analyticsSection.querySelector('h2');
+            if (h2) h2.style.display = 'none'; // Hide "Deep Dive Analytics" header
+        }
+        const stratChart = document.getElementById('uploadStrategyChart');
+        if (stratChart) stratChart.parentElement.style.display = 'none'; // Hide "Best Upload Time"
 
         // Charts for Comparison
         // We need to adapt renderCharts to accept multi-dataset or just show a simple comparison chart manually here using the existing canvas

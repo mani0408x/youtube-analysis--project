@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - YouTube Analytics</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=force_restart">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
@@ -36,15 +36,13 @@
                 <div class="search-container">
                     <i class="fas fa-search" style="color: var(--text-muted);"></i>
                     <div id="channel-inputs-container" style="flex:1; display:flex; flex-direction: column; gap: 5px;">
-                        <input type="text" id="channel-id-input" placeholder="Paste Channel ID to Analyze...">
+                        <!-- JS injected inputs -->
                     </div>
                 </div>
                 <!-- ... Actions ... -->
                 <div class="actions" style="display:flex; gap:10px; align-items:center;">
                     <div class="toggle-container" style="display:flex; align-items:center; gap:8px;">
-                        <button id="compare-top-btn" class="btn-ghost"
-                            style="font-size:0.8rem; padding: 4px 8px; border:1px solid var(--glass-border); border-radius:4px; margin-right:10px;">Compare
-                            Top 5</button>
+                        <button id="compare-top-btn" class="btn-ghost" style="display:none;">Compare Top 5</button>
                         <span style="font-size:0.8rem; color:var(--text-secondary);">Compare</span>
                         <label class="switch">
                             <input type="checkbox" id="compare-mode-toggle">
@@ -260,8 +258,8 @@
     </div>
 
     <!-- Firebase SDKs (Modular) -->
-    <script type="module" src="js/auth.js"></script>
-    <script type="module" src="js/dashboard.js"></script>
+    <script type="module" src="js/auth.js?v=force_restart"></script>
+    <script type="module" src="js/dashboard.js?v=force_restart"></script>
 </body>
 
 </html>
