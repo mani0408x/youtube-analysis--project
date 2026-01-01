@@ -1,5 +1,5 @@
 from backend.config import Config
-from backend.extensions import db, init_firebase
+from backend.extensions import db
 from backend import models # Ensure models are loaded before create_all
 from flask import send_from_directory, Flask
 
@@ -15,8 +15,13 @@ def create_app(config_class=Config):
     def dashboard():
         return send_from_directory(app.static_folder, 'dashboard.html')
 
+    @app.route('/login')
+    def login_page():
+        return send_from_directory(app.static_folder, 'login.html')
+
     # Initialize extensions
-    init_firebase()
+    # init_firebase() - Removed in favor of Google OAuth
+
     db.init_app(app)
 
     with app.app_context():

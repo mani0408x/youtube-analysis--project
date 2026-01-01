@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "C:\Users\asus\OneDrive\Desktop\updated yt analysis\youtube-analysis--project\run.py", line 8, in <module>
+    app = create_app()
+          ^^^^^^^^^^^^
+  File "C:\Users\asus\OneDrive\Desktop\updated yt analysis\youtube-analysis--project\backend\app.py", line 31, in create_app
+    from backend.routes.auth import auth_bp, init_oauth
+  File "C:\Users\asus\OneDrive\Desktop\updated yt analysis\youtube-analysis--project\backend\routes\auth.py", line 6, in <module>
+    import jwt
+ModuleNotFoundError: No module named 'jwt'
+DEBUG: Loading .env from C:\Users\asus\OneDrive\Desktop\updated yt analysis\youtube-analysis--project\backend\..\.env, Exists: True
+DEBUG: Configured DB URI using split fields. User: root
+Server crashed: No module named 'jwt'

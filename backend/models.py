@@ -3,10 +3,11 @@ from datetime import datetime
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    firebase_uid = db.Column(db.String(128), unique=True, nullable=False)
+    firebase_uid = db.Column(db.String(128), unique=True, nullable=True) # Nullable for email-only users
     email = db.Column(db.String(100), unique=True, nullable=False)
     name = db.Column(db.String(100), nullable=False)
     photo_url = db.Column(db.String(255))
+    password_hash = db.Column(db.String(255)) # Stored hash
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 class Channel(db.Model):

@@ -4,13 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YouTube Analytics - Internship Project</title>
+    <title>YA - Internship Project</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 
 <body>
@@ -28,51 +29,205 @@
             </div>
         </header>
 
-        <main class="landing-hero">
-            <div class="hero-content">
-                <h1>Unlock Hidden <span class="gradient-text">Insights</span> from Your Channel</h1>
+        <!-- Reference-Based Redesign Structure -->
+
+        <!-- 1. Centered Hero -->
+        <main class="landing-hero centered-hero">
+            <div class="hero-content centered-content">
+                <div class="hero-badge">🚀 Trending on YouTube Analytics</div>
+                <h1>Get More Views & Subscribers on <span class="gradient-text">YouTube</span></h1>
                 <p class="hero-subtitle">
-                    A comprehensive full-stack analytics platform built to visualize engagement metrics,
-                    track growth trends, and identify your top-performing content.
+                    The ultimate growth toolkit for modern creators.
+                    Unlock deep insights, track competitor performance, and optimize your content strategy in seconds.
                 </p>
 
-                <div class="features-grid">
-                    <div class="feature-item">
-                        <i class="fas fa-chart-line"></i>
-                        <span>Growth Tracking</span>
-                    </div>
-                    <div class="feature-item">
-                        <i class="fas fa-thumbs-up"></i>
-                        <span>Engagement Analysis</span>
-                    </div>
-                    <div class="feature-item">
-                        <i class="fas fa-file-video"></i>
-                        <span>Video Metadata</span>
-                    </div>
-                </div>
-
                 <div class="cta-section">
-                    <button id="login-btn" class="btn-login-large" style="border:none; cursor:pointer;">
-                        <i class="fab fa-google"></i> Login with Google to Start
-                    </button>
-                </div>
-            </div>
-
-            <div class="hero-visual">
-                <!-- Abstract Dashboard Representation -->
-                <div class="visual-card card-1">
-                    <div class="skeleton-line title"></div>
-                    <div class="skeleton-graph"></div>
-                </div>
-                <div class="visual-card card-2">
-                    <div class="skeleton-circle"></div>
-                    <div class="skeleton-line short"></div>
+                    <a href="/login" class="btn-login-large">
+                        <i class="fab fa-google"></i> Sign up with Google
+                    </a>
+                    <p class="cta-note">No credit card required. Free for students.</p>
                 </div>
             </div>
         </main>
 
+        <!-- 2. Toolkit Section (Icons) -->
+        <section class="toolkit-section">
+            <h2 class="section-title">The Ultimate YouTube <span class="gradient-text">Growth Toolkit</span></h2>
+            <div class="toolkit-grid">
+                <div class="tool-item">
+                    <div class="tool-icon glass-effect"><i class="fas fa-chart-line"></i></div>
+                    <span>Analytics</span>
+                </div>
+                <div class="tool-item">
+                    <div class="tool-icon glass-effect"><i class="fas fa-key"></i></div>
+                    <span>Keywords</span>
+                </div>
+                <div class="tool-item">
+                    <div class="tool-icon glass-effect"><i class="fas fa-robot"></i></div>
+                    <span>AI Ideas</span>
+                </div>
+                <div class="tool-item">
+                    <div class="tool-icon glass-effect"><i class="fas fa-users"></i></div>
+                    <span>Competitors</span>
+                </div>
+                <div class="tool-item">
+                    <div class="tool-icon glass-effect"><i class="fas fa-clock"></i></div>
+                    <span>Best Time</span>
+                </div>
+                <div class="tool-item">
+                    <div class="tool-icon glass-effect"><i class="fas fa-search-dollar"></i></div>
+                    <span>Audit</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Dashboard Preview Section -->
+        <section class="preview-section">
+            <h2 class="section-title">Grow faster without ever leaving <span class="gradient-text">YouTube</span></h2>
+            <p class="section-subtitle">See what success looks like and achieve your goals faster with data.</p>
+
+            <div class="dashboard-visual glass-effect">
+                <!-- Abstract UI Representation mimicking the screenshot's dashboard view -->
+                <div class="ui-header">
+                    <div class="ui-dot" style="background:#ff5f56"></div>
+                    <div class="ui-dot" style="background:#ffbd2e"></div>
+                    <div class="ui-dot" style="background:#27c93f"></div>
+                </div>
+                <div class="ui-body">
+                    <div class="ui-sidebar">
+                        <div class="skeleton-line short"></div>
+                        <div class="skeleton-line short"></div>
+                        <div class="skeleton-line short"></div>
+                    </div>
+                    <div class="ui-content">
+                        <div class="ui-chart-area">
+                            <div class="skeleton-graph"></div>
+                        </div>
+                        <div class="ui-stats-row">
+                            <div class="skeleton-box"></div>
+                            <div class="skeleton-box"></div>
+                            <div class="skeleton-box"></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Floating Element -->
+                <div class="ui-floating-card glass-effect">
+                    <i class="fas fa-arrow-up trend-up"></i>
+                    <span>+245% Views</span>
+                </div>
+            </div>
+
+            <div class="cta-center">
+                <a href="/dashboard" class="btn-primary-sm">See It In Action</a>
+            </div>
+        </section>
+
+        <!-- 4. Testimonial Grid -->
+        <section class="testimonial-grid-section">
+            <h2 class="section-title">Hear from real creators using <span class="gradient-text">AnalyticsPro</span></h2>
+
+            <div class="testimonials-masonry">
+                <!-- Existing ONE updated -->
+                <div class="testimony-card glass-effect">
+                    <div class="quote-icon"><i class="fas fa-quote-left"></i></div>
+                    <p class="testimony-text">"This analytics dashboard completely changed how I plan my content. The
+                        comparative insights are a game changer!"</p>
+                    <div class="testimony-author">
+                        <div class="avatar-placeholder">SP</div>
+                        <div class="author-details">
+                            <span class="name">Sarah Parker</span>
+                            <span class="role">Tech Reviewer (500k+)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- New Dummy ONE -->
+                <div class="testimony-card glass-effect">
+                    <div class="quote-icon"><i class="fas fa-quote-left"></i></div>
+                    <p class="testimony-text">"I used to guess what would work. Now I know. The AI ideas are
+                        surprisingly accurate."</p>
+                    <div class="testimony-author">
+                        <div class="avatar-placeholder" style="background:var(--gradient-primary)">JD</div>
+                        <div class="author-details">
+                            <span class="name">John Doe</span>
+                            <span class="role">Gaming (1M+)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- New Dummy TWO -->
+                <div class="testimony-card glass-effect">
+                    <div class="quote-icon"><i class="fas fa-quote-left"></i></div>
+                    <p class="testimony-text">"The competitor tracking feature helps me stay ahead of trends in my
+                        niche. Essential tool."</p>
+                    <div class="testimony-author">
+                        <div class="avatar-placeholder" style="background:#ff6b6b">AL</div>
+                        <div class="author-details">
+                            <span class="name">Ana Lee</span>
+                            <span class="role">Vlog (250k+)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. Pricing Section -->
+        <section class="pricing-section">
+            <h2 class="section-title">Supercharge your growth <span class="gradient-text">today</span></h2>
+
+            <div class="pricing-grid">
+                <!-- Free Tier -->
+                <div class="pricing-card glass-effect">
+                    <h3>Free</h3>
+                    <div class="price">Free</div>
+                    <p class="price-desc">Forever free for basic analytics.</p>
+                    <ul class="features-list">
+                        <li><i class="fas fa-check"></i> 1 Channel Analysis</li>
+                        <li><i class="fas fa-check"></i> Basic Metrics</li>
+                        <li><i class="fas fa-check"></i> 3 Daily AI Ideas</li>
+                    </ul>
+                    <a href="/signup" class="btn-ghost"
+                        style="width:100%; display:block; text-align:center; padding:10px; margin-top:20px; border:1px solid rgba(255,255,255,0.2); border-radius:50px;">Sign
+                        Up Free</a>
+                </div>
+
+                <!-- Boost Tier -->
+                <div class="pricing-card glass-effect highlight-card">
+                    <div class="popular-tag">Most Popular</div>
+                    <h3>Boost</h3>
+                    <div class="price">$49<span class="period">/mo</span></div>
+                    <p class="price-desc">For serious creators growing fast.</p>
+                    <ul class="features-list">
+                        <li><i class="fas fa-check"></i> Unlimited Channels</li>
+                        <li><i class="fas fa-check"></i> Competitor Tracking</li>
+                        <li><i class="fas fa-check"></i> Unlimited AI Ideas</li>
+                        <li><i class="fas fa-check"></i> Export Data</li>
+                    </ul>
+                    <a href="/signup" class="btn-login-large"
+                        style="width:100%; display:block; text-align:center; margin-top:20px; font-size:1rem;">Get
+                        Boost</a>
+                </div>
+
+                <!-- Coaching Tier -->
+                <div class="pricing-card glass-effect">
+                    <h3>Coaching</h3>
+                    <div class="price">$199<span class="period">/mo</span></div>
+                    <p class="price-desc">1-on-1 expert guidance.</p>
+                    <ul class="features-list">
+                        <li><i class="fas fa-check"></i> Everything in Boost</li>
+                        <li><i class="fas fa-check"></i> Monthly Audit Call</li>
+                        <li><i class="fas fa-check"></i> Strategy Plan</li>
+                    </ul>
+                    <a href="#" class="btn-ghost"
+                        style="width:100%; display:block; text-align:center; padding:10px; margin-top:20px; border:1px solid rgba(255,255,255,0.2); border-radius:50px;">Contact
+                        Us</a>
+                </div>
+            </div>
+        </section>
+
         <footer>
-            <p>&copy; 2025 YouTube Analytics Project. Designed & Developed by Shailendra Mani Pandey.</p>
+            <p>&copy; 2025 YouTube Analytics Project. Crafted with <i class="fas fa-heart" style="color:#ff6b6b"></i> by
+                Shailendra Mani Pandey.</p>
         </footer>
     </div>
     <!-- Firebase SDKs (Modular) -->

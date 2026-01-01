@@ -133,10 +133,11 @@ def process_channel_analysis(channel_id):
             ]
         })
     except Exception as e:
+        # Log to file/console clearly
+        print(f"ANALYSIS ERROR: {str(e)}")
         current_app.logger.error(f"Error processing channel {channel_id}: {str(e)}")
-        # Re-raise or return special error dict?
-        # Better to catch in the route handler, but helper is used by multiple.
-        # Let's return a dict with error key for simplicity in route handler checks
+        import traceback
+        traceback.print_exc()
         return {'error': str(e)}
 
 @api_bp.route('/analyze', methods=['POST'])
@@ -227,3 +228,13 @@ def get_stats(channel_id):
         'title': channel.title,
         'subscribers': channel.subscriber_count
     })
+
+@api_bp.route('/config/public', methods=['GET'])
+def get_public_config():
+    """
+    Returns public configuration mainly for frontend usage.
+    """
+    return jsonify({
+        'google_client_id': current_app.config.get('GOOGLE_CLIENT_ID')
+    })
+
