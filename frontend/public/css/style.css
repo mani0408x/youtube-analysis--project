@@ -41,6 +41,7 @@ html {
     backdrop-filter: var(--backdrop-blur);
     display: flex;
     flex-direction: column;
+    z-index: 100;
 }
 
 .logo {
@@ -59,35 +60,48 @@ html {
     color: transparent;
 }
 
-.nav-links {
+/* --- Sidebar specific nav --- */
+/* Target direct child of sidebar to avoid conflicts */
+.sidebar .nav-links {
     list-style: none;
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-sm);
-    flex-grow: 1;
+    gap: 10px;
+    /* Consistent gap */
+    padding: 0;
+    margin: 0;
 }
 
-.nav-item {
+.sidebar .nav-item {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
+    gap: 15px;
+    /* Fixed gap between icon and text */
+    padding: 12px 20px;
     color: var(--text-secondary);
     border-radius: var(--radius-md);
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     text-decoration: none;
+    font-size: 0.95rem;
+    width: 100%;
+    /* Ensure full width */
 }
 
-.nav-item:hover,
-.nav-item.active {
-    background: var(--bg-card-hover);
-    color: var(--text-primary);
+.sidebar .nav-item:hover,
+.sidebar .nav-item.active {
+    background: rgba(255, 255, 255, 0.08);
+    /* Lighter hover */
+    color: #fff;
+    border-left: 3px solid var(--primary-color);
+    /* Highlight indicator */
 }
 
-.nav-item i {
-    width: 20px;
+.sidebar .nav-item i {
+    width: 24px;
+    /* Fixed icon width for alignment */
     text-align: center;
+    font-size: 1rem;
 }
 
 .user-profile {
@@ -122,10 +136,78 @@ html {
     color: var(--text-muted);
 }
 
+/* Profile Dropdown Menu */
+.user-profile {
+    position: relative;
+    /* Context for absolute menu */
+    cursor: pointer;
+}
+
+.profile-menu {
+    position: absolute;
+    bottom: 110%;
+    /* Above the profile area */
+    left: 0;
+    width: 100%;
+    background: var(--bg-card);
+    border: var(--glass-border);
+    border-radius: var(--radius-md);
+    padding: 5px;
+    display: none;
+    /* Hidden by default */
+    flex-direction: column;
+    box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 0.2s ease;
+}
+
+.profile-menu.active {
+    display: flex;
+}
+
+.profile-menu-item {
+    padding: 10px 15px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.9rem;
+    border-radius: 5px;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+}
+
+.profile-menu-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+}
+
+.profile-menu-item.danger:hover {
+    background: rgba(255, 71, 87, 0.1);
+    color: #ff4757;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 /* --- Main Content --- */
 .main-content {
     padding: var(--spacing-lg);
     overflow-y: auto;
+    max-height: 100vh;
 }
 
 /* Header */
@@ -134,33 +216,56 @@ html {
     justify-content: space-between;
     align-items: center;
     margin-bottom: var(--spacing-lg);
+    background: var(--bg-card);
+    padding: 15px 20px;
+    border-radius: var(--radius-md);
+    border: var(--glass-border);
+    backdrop-filter: blur(10px);
 }
 
+/* New Input Styles */
 .search-container {
-    background: var(--bg-card);
+    background: var(--gradient-glass);
+    /* Glass container */
     border: var(--glass-border);
-    border-radius: 50px;
-    padding: 10px 20px;
+    border-radius: var(--radius-md);
+    /* Rectangular-ish with small radius */
+    padding: 15px;
     display: flex;
     align-items: center;
-    width: 60%;
-    max-width: 600px;
+    width: 40%;
+    max-width: 400px;
+    /* Remove rounding */
+    border-radius: 8px;
 }
 
-.search-container input {
-    background: transparent;
-    border: none;
-    color: var(--text-primary);
+.search-container input,
+.glass-input {
+    background: #000;
+    /* Black background */
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    /* Rectangular border */
+    color: white;
     width: 100%;
-    margin-left: 10px;
+    margin-left: 0;
+    /* Reset margin */
     outline: none;
-    font-size: 1rem;
+    font-size: 0.95rem;
+    padding: 10px 15px;
+    border-radius: 4px;
+    /* Slight radius but mostly rectangular */
+}
+
+/* Force inputs container to strip gap */
+#channel-inputs-container {
+    gap: 10px;
 }
 
 /* Dashboard Grid */
 .dashboard-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    /* Smaller min-width for flexibility */
     gap: var(--spacing-md);
     margin-bottom: var(--spacing-lg);
 }
@@ -214,10 +319,21 @@ html {
     cursor: pointer;
     box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
     transition: transform 0.2s;
+    text-decoration: none;
+    display: inline-block;
 }
 
 .btn-primary:active {
     transform: scale(0.98);
+}
+
+.btn-ghost {
+    background: transparent;
+    border: 1px solid var(--text-muted);
+    color: var(--text-secondary);
+    padding: 8px 16px;
+    border-radius: 50px;
+    cursor: pointer;
 }
 
 /* Tables */
@@ -247,8 +363,8 @@ html {
     background: var(--bg-card-hover);
 }
 
-/* Landing Page Specifics (Minimal updates to keep main.css working or replace it) */
-/* Navbar */
+/* --- Landing Page Overrides --- */
+/* The navbar class targets the specific landing page nav */
 .navbar {
     position: fixed;
     top: 20px;
@@ -262,32 +378,33 @@ html {
     align-items: center;
     z-index: 1000;
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    background: rgba(15, 15, 19, 0.7);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    /* More subtle border */
+    border-radius: 50px;
+    /* Pill shape */
 }
 
-.nav-container {
+/* Use > to only target direct children of navbar, avoiding sidebar conflicts */
+.navbar .nav-links {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-}
-
-.nav-links {
-    display: flex;
+    flex-direction: row;
     gap: 30px;
     list-style: none;
-    /* crucial override */
-    flex-direction: row;
-    /* override sidebar vertical */
+    background: transparent;
+    /* Reset */
+    padding: 0;
 }
 
-.nav-links a {
+.navbar .nav-links a {
     color: var(--text-secondary);
     text-decoration: none;
     font-weight: 500;
     transition: color 0.3s;
 }
 
-.nav-links a:hover {
+.navbar .nav-links a:hover {
     color: #fff;
 }
 
@@ -327,23 +444,44 @@ html {
 
 /* Lean Hero */
 .landing-hero.lean-hero {
-    min-height: 80vh;
+    min-height: 90vh;
+    /* Taller hero */
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-top: 100px;
-    /* Space for navbar */
+    padding: 120px 10% 0;
+    /* Centered with top padding */
     text-align: left;
+    position: relative;
+    overflow: hidden;
+    /* Contain visuals */
+    max-width: 1400px;
+    margin: 0 auto;
 }
 
 .lean-hero .hero-content {
     max-width: 600px;
+    z-index: 2;
+}
+
+.landing-hero h1 {
+    font-size: 3.5rem;
+    line-height: 1.1;
+    margin-bottom: 20px;
+}
+
+.hero-subtext {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 30px;
+    max-width: 90%;
 }
 
 .lean-visual {
     position: relative;
-    width: 400px;
-    height: 300px;
+    width: 450px;
+    height: 350px;
 }
 
 .cta-note {
@@ -354,14 +492,16 @@ html {
 
 /* Features Section (New) */
 .features-section {
-    padding: 60px 0;
+    padding: 80px 10%;
+    max-width: 1400px;
+    margin: 0 auto;
 }
 
 .features-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 30px;
-    margin-top: 0;
+    margin-top: 50px;
 }
 
 .feature-item {
@@ -374,6 +514,7 @@ html {
 .feature-item:hover {
     transform: translateY(-5px);
     background: rgba(255, 255, 255, 0.05);
+    /* Subtle highlight */
 }
 
 .feature-item i {
@@ -396,13 +537,6 @@ html {
     line-height: 1.6;
 }
 
-/* Restored basic hero h1 for reference/fallback */
-.landing-hero h1 {
-    font-size: 3.5rem;
-    line-height: 1.1;
-    margin-bottom: 20px;
-}
-
 .gradient-text {
     background: var(--gradient-accent);
     -webkit-background-clip: text;
@@ -418,103 +552,11 @@ html {
     border-radius: var(--radius-lg);
 }
 
-/* About Section */
-.about-section {
-    padding: 80px 20px;
-    background: rgba(0, 0, 0, 0.2);
-    position: relative;
-    overflow: hidden;
-}
-
-.about-container {
-    max-width: 1000px;
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-    gap: 50px;
-    position: relative;
-    z-index: 2;
-}
-
-.author-image-wrapper {
-    flex-shrink: 0;
-    width: 280px;
-    height: 280px;
-    border-radius: 50%;
-    padding: 5px;
-    background: var(--gradient-primary);
-    /* Gradient border */
-    position: relative;
-}
-
-.author-image-wrapper::before {
-    content: '';
-    position: absolute;
-    inset: -10px;
-    background: var(--gradient-primary);
-    filter: blur(20px);
-    border-radius: 50%;
-    z-index: -1;
-    opacity: 0.5;
-}
-
-.author-img {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 4px solid var(--bg-dark);
-}
-
-.author-bio h2 {
-    font-size: 2.5rem;
-    margin-bottom: 15px;
-}
-
-.author-bio h3 {
-    font-size: 1.5rem;
-    color: var(--text-primary);
-    margin-bottom: 5px;
-}
-
-.role-text {
-    font-size: 1rem;
-    color: #FF6B6B;
-    /* Accent */
-    font-weight: 500;
-    margin-bottom: 20px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.bio-text {
-    color: var(--text-secondary);
-    line-height: 1.7;
-    margin-bottom: 25px;
-    font-size: 1.05rem;
-}
-
-.social-links {
-    display: flex;
-    gap: 20px;
-}
-
-.social-links a {
-    color: var(--text-muted);
-    font-size: 1.5rem;
-    transition: color 0.3s, transform 0.3s;
-}
-
-.social-links a:hover {
-    color: #fff;
-    transform: translateY(-3px);
-}
-
 /* Testimony Section */
 .testimony-section {
     padding: 100px 20px;
     text-align: center;
-    background: radial-gradient(circle at center, rgba(124, 58, 237, 0.1) 0%, transparent 60%);
+    background: radial-gradient(circle at center, rgba(124, 58, 237, 0.05) 0%, transparent 60%);
 }
 
 .testimony-section h2 {
@@ -527,82 +569,54 @@ html {
 }
 
 .testimony-card {
-    max-width: 700px;
-    margin: 0 auto;
     background: var(--gradient-glass);
-    padding: 40px;
+    padding: 30px;
     border-radius: 20px;
     border: var(--glass-border);
     position: relative;
-}
-
-.quote-icon {
-    font-size: 2rem;
-    color: rgba(255, 255, 255, 0.1);
-    margin-bottom: 20px;
-}
-
-.testimony-text {
-    font-size: 1.25rem;
-    color: var(--text-primary);
-    font-style: italic;
-    line-height: 1.6;
-    margin-bottom: 30px;
-}
-
-.testimony-author {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 15px;
-}
-
-.avatar-placeholder {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background: var(--gradient-secondary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    color: white;
-}
-
-.author-details {
     text-align: left;
-    display: flex;
-    flex-direction: column;
-}
-
-.author-details .name {
-    font-weight: 600;
-    font-size: 1rem;
-}
-
-.author-details .role {
-    font-size: 0.85rem;
-    color: var(--text-muted);
 }
 
 /* Responsive Redesign */
 @media (max-width: 768px) {
-    .about-container {
-        flex-direction: column;
-        text-align: center;
-        gap: 30px;
+    .app-container {
+        grid-template-columns: 1fr;
+        /* Stack sidebar and content */
     }
 
-    .author-details {
-        text-align: center;
-        /* Center align for mobile testimony */
+    .sidebar {
+        display: none;
+        /* Hide sidebar on mobile for now - TODO: Add hamburger menu */
     }
 
-    .testimony-author {
+    .lean-hero {
         flex-direction: column;
+        padding-top: 150px;
+        text-align: center;
+    }
+
+    .hero-content {
+        align-items: center;
+        /* Center flex items if any */
+        margin-bottom: 50px;
+    }
+
+    .lean-visual {
+        width: 100%;
+        height: 300px;
     }
 
     .landing-hero h1 {
         font-size: 2.5rem;
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        /* Stack dashboard cards on mobile */
+    }
+
+    .search-container {
+        width: 100%;
+        /* Full width search on mobile */
     }
 }

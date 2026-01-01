@@ -1,0 +1,20 @@
+# Project Suggestions & Future Roadmap
+
+## 1. Advanced Analytics
+- **Sentiment Analysis**: Integrate Natural Language Processing (NLP) to analyze comment sentiment (positive/negative/neutral) and identify common keywords.
+- **Audience Demographics**: If user Auth is upgraded to YouTube Partner API, fetch real demographics (Age, Gender, Geography).
+- **Competitor Tracking**: Allow users to save "Competitor Sets" for one-click weekly comparisons.
+
+## 2. User Experience (UX)
+- **Dark/Light Mode Toggle**: Currently strictly dark mode. Add a toggle for accessibility.
+- **Mobile App**: Wrap the frontend in a PWA (Progressive Web App) manifest for mobile installation.
+- **Custom Dashboards**: Allow users to drag-and-drop KPI cards to rearrange their dashboard.
+
+## 3. AI Features
+- **Thumbnail Grading**: Use Vision AI to score thumbnails based on brightness, text contrast, and face detection.
+- **Auto-Reply**: Generate AI responses for YouTube comments to save creator time.
+
+## 4. Technical Improvements
+- **Caching**: Implement Redis to cache API responses for 1-6 hours to reduce quota usage.
+- **WebSockets**: Use Socket.io for real-time progress updates during heavy analysis tasks.
+- **Testing**: Add End-to-End (E2E) tests using Cypress or Playwright.

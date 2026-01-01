@@ -50,16 +50,28 @@ def segment_videos(videos):
         ]
     }
 
-def mock_historical_data(current_views, current_subs):
+def get_historical_data(channel_id, current_views, current_subs):
     """
-    Generates 15 days of mocked historical data for demonstration.
-    Creates a realistic growth curve leading up to current values.
+    Retrieves historical data from DailyChannelStats.
+    If not enough data (< 2 days), falls back to simulation.
     """
+    from backend.models import DailyChannelStats
+    
+    # Try to fetch real history
+    history = DailyChannelStats.query.filter_by(channel_id=channel_id).order_by(DailyChannelStats.date.asc()).all()
+    
+    if len(history) >= 2:
+        return [{
+            'date': h.date.strftime('%Y-%m-%d'),
+            'views': h.views,
+            'subscribers': h.subscribers
+        } for h in history]
+    
+    # Fallback to simulation if no history
     data = []
-    # Reverse loop: Today -> 14 days ago
     for i in range(14, -1, -1):
         date = (datetime.utcnow() - timedelta(days=i)).strftime('%Y-%m-%d')
-        # Simulate slight daily variation (random drop 0-2%)
+        # Simulate slight daily variation
         factor = 1.0 - (i * 0.01) - (random.uniform(0, 0.005))
         
         sim_views = int(current_views * factor)
@@ -68,7 +80,8 @@ def mock_historical_data(current_views, current_subs):
         data.append({
             'date': date,
             'views': sim_views,
-            'subscribers': sim_subs
+            'subscribers': sim_subs,
+            'estimated': True # Flag to indicate simulated data
         })
     return data
 

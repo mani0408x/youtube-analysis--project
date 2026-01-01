@@ -4,236 +4,253 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YA - Internship Project</title>
+    <title>AnalyticsPro - YouTube Intelligence</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
-    <!-- FontAwesome for Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Google Identity -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script>
+        // Persistent Auth: Redirect to dashboard if logged in
+        (function () {
+            const token = localStorage.getItem('auth_token');
+            if (token) {
+                // Verify token validity optional, but for speed just redirect
+                window.location.href = '/dashboard.html';
+            }
+        })();
+    </script>
 </head>
 
 <body>
-    <div class="landing-background">
-        <div class="glass-overlay"></div>
-    </div>
 
-    <div class="container landing-container">
-        <header class="landing-header">
-            <div class="logo">
-                <i class="fab fa-youtube"></i> Analytics<span class="highlight">Pro</span>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fab fa-youtube"></i> AnalyticsPro
+        </div>
+        <ul class="nav-links">
+            <li><a href="#features">Features</a></li>
+            <li><a href="#testimonials">Testimonials</a></li>
+        </ul>
+        <div class="nav-actions">
+            <a href="/login" class="nav-link-btn">Login</a>
+            <a href="/login" class="btn-primary-sm">Get Started</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="landing-hero lean-hero">
+        <div class="hero-content">
+            <h1>Master Your <br><span class="gradient-text">YouTube Growth</span></h1>
+            <p class="hero-subtext">
+                Stop guessing. Start growing. Get deep insights, competitor analysis, and AI-driven content
+                recommendations to skyrocket your channel.
+            </p>
+            <div class="hero-cta-group">
+                <a href="/login" class="btn-primary">Start Analyzing Free</a>
+                <p class="cta-note"><i class="fas fa-check-circle" style="color:var(--success);"></i> No credit card
+                    required</p>
             </div>
-            <div class="credits">
-                Internship Project by <strong>Shailendra Mani Pandey</strong>
+        </div>
+        <div class="lean-visual">
+            <!-- Abstract Visual / Dashboard Preview Mini -->
+            <div class="glass-card"
+                style="position:absolute; top:0; right:0; width:100%; height:100%; transform: rotate(-3deg); z-index:1; border:1px solid rgba(255,255,255,0.2);">
+                <div style="display:flex; gap:10px; margin-bottom:15px;">
+                    <div style="width:12px; height:12px; border-radius:50%; background:#FF5F56;"></div>
+                    <div style="width:12px; height:12px; border-radius:50%; background:#FFBD2E;"></div>
+                    <div style="width:12px; height:12px; border-radius:50%; background:#27C93F;"></div>
+                </div>
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:20px;">
+                    <div style="width:40px; height:40px; border-radius:50%; background:var(--gradient-primary);"></div>
+                    <div>
+                        <div
+                            style="width:100px; height:10px; background:rgba(255,255,255,0.1); border-radius:4px; margin-bottom:5px;">
+                        </div>
+                        <div style="width:60px; height:8px; background:rgba(255,255,255,0.05); border-radius:4px;">
+                        </div>
+                    </div>
+                </div>
+                <!-- Chart Mockup -->
+                <div
+                    style="display:flex; align-items:flex-end; gap:8px; height:100px; padding-bottom:10px; border-bottom:1px solid rgba(255,255,255,0.1);">
+                    <div
+                        style="flex:1; background:var(--gradient-accent); height:40%; border-radius:4px 4px 0 0; opacity:0.5;">
+                    </div>
+                    <div
+                        style="flex:1; background:var(--gradient-accent); height:70%; border-radius:4px 4px 0 0; opacity:0.7;">
+                    </div>
+                    <div
+                        style="flex:1; background:var(--gradient-accent); height:55%; border-radius:4px 4px 0 0; opacity:0.6;">
+                    </div>
+                    <div style="flex:1; background:var(--gradient-accent); height:90%; border-radius:4px 4px 0 0;">
+                    </div>
+                    <div
+                        style="flex:1; background:var(--gradient-accent); height:60%; border-radius:4px 4px 0 0; opacity:0.6;">
+                    </div>
+                </div>
             </div>
-        </header>
+            <div class="glass-card"
+                style="position:absolute; top:20px; right:-20px; width:180px; transform: rotate(5deg); z-index:2; backdrop-filter: blur(20px);">
+                <div style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:5px;">Engagement Rate</div>
+                <div style="font-size:1.5rem; font-weight:700;">+12.5% <i class="fas fa-arrow-up"
+                        style="font-size:0.9rem; color:var(--success);"></i></div>
+            </div>
+        </div>
+    </section>
 
-        <!-- Reference-Based Redesign Structure -->
-
-        <!-- 1. Centered Hero -->
-        <main class="landing-hero centered-hero">
-            <div class="hero-content centered-content">
-                <div class="hero-badge">🚀 Trending on YouTube Analytics</div>
-                <h1>Get More Views & Subscribers on <span class="gradient-text">YouTube</span></h1>
-                <p class="hero-subtitle">
-                    The ultimate growth toolkit for modern creators.
-                    Unlock deep insights, track competitor performance, and optimize your content strategy in seconds.
+    <!-- Toolkit / Features Section -->
+    <section id="features" class="features-section">
+        <div style="text-align:center; max-width:700px; margin:0 auto 50px;">
+            <h2 class="section-title">The Creator's <span class="gradient-text">Toolkit</span></h2>
+            <p style="color:var(--text-secondary);">Everything you need to understand your audience and outperform the
+                algorithm.</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-item glass-effect">
+                <i class="fas fa-chart-area"></i>
+                <h3>Deep Analytics</h3>
+                <p>Go beyond vanity metrics. Track real engagement, audience retention, and growth patterns over time.
                 </p>
+            </div>
+            <div class="feature-item glass-effect">
+                <i class="fas fa-robot"></i>
+                <h3>AI Recommendations</h3>
+                <p>Get AI-powered video ideas, titles, and script outlines tailored to your niche and audience.</p>
+            </div>
+            <div class="feature-item glass-effect">
+                <i class="fas fa-exchange-alt"></i>
+                <h3>Competitor Compare</h3>
+                <p>Benchmark your channel against top performers in your niche. See what they're doing right.</p>
+            </div>
+            <div class="feature-item glass-effect">
+                <i class="fas fa-calendar-check"></i>
+                <h3>Upload Strategy</h3>
+                <p>Know exactly when to post for maximum reach based on your audience's activity patterns.</p>
+            </div>
+            <div class="feature-item glass-effect">
+                <i class="fas fa-file-invoice-dollar"></i>
+                <h3>Monthly Reports</h3>
+                <p>Automated monthly performance summaries delivered to keep you on track.</p>
+            </div>
+            <div class="feature-item glass-effect">
+                <i class="fas fa-shield-alt"></i>
+                <h3>Secure & Private</h3>
+                <p>Your data is yours. We use official YouTube APIs and enterprise-grade security.</p>
+            </div>
+        </div>
+    </section>
 
-                <div class="cta-section">
-                    <a href="/login" class="btn-login-large">
-                        <i class="fab fa-google"></i> Sign up with Google
-                    </a>
-                    <p class="cta-note">No credit card required. Free for students.</p>
+    <!-- Dashboard Preview Section -->
+    <section class="about-section glass-effect" style="margin: 50px 0; border-radius:20px;">
+        <div style="text-align:center; margin-bottom:40px;">
+            <h2>Powerful Interface</h2>
+            <p style="color:var(--text-secondary);">Designed for clarity and speed.</p>
+        </div>
+        <!-- Mockup Image or CSS implementation -->
+        <div
+            style="position:relative; max-width:900px; margin:0 auto; height:400px; background:rgba(0,0,0,0.5); border-radius:10px; border:1px solid rgba(255,255,255,0.1); overflow:hidden; display:flex;">
+            <!-- Sidebar Mockup -->
+            <div style="width:200px; border-right:1px solid rgba(255,255,255,0.1); padding:20px;">
+                <div
+                    style="width:30px; height:30px; background:var(--gradient-primary); border-radius:8px; margin-bottom:30px;">
+                </div>
+                <div
+                    style="height:10px; width:80%; background:rgba(255,255,255,0.1); margin-bottom:15px; border-radius:4px;">
+                </div>
+                <div
+                    style="height:10px; width:80%; background:rgba(255,255,255,0.1); margin-bottom:15px; border-radius:4px;">
+                </div>
+                <div
+                    style="height:10px; width:60%; background:rgba(255,255,255,0.1); margin-bottom:15px; border-radius:4px;">
                 </div>
             </div>
-        </main>
-
-        <!-- 2. Toolkit Section (Icons) -->
-        <section class="toolkit-section">
-            <h2 class="section-title">The Ultimate YouTube <span class="gradient-text">Growth Toolkit</span></h2>
-            <div class="toolkit-grid">
-                <div class="tool-item">
-                    <div class="tool-icon glass-effect"><i class="fas fa-chart-line"></i></div>
-                    <span>Analytics</span>
+            <!-- Content Mockup -->
+            <div style="flex:1; padding:20px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+                    <div style="height:30px; width:200px; background:rgba(255,255,255,0.1); border-radius:15px;"></div>
+                    <div style="height:30px; width:100px; background:rgba(255,255,255,0.1); border-radius:15px;"></div>
                 </div>
-                <div class="tool-item">
-                    <div class="tool-icon glass-effect"><i class="fas fa-key"></i></div>
-                    <span>Keywords</span>
+                <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:15px;">
+                    <div style="height:100px; background:rgba(255,255,255,0.05); border-radius:10px;"></div>
+                    <div style="height:100px; background:rgba(255,255,255,0.05); border-radius:10px;"></div>
+                    <div style="height:100px; background:rgba(255,255,255,0.05); border-radius:10px;"></div>
                 </div>
-                <div class="tool-item">
-                    <div class="tool-icon glass-effect"><i class="fas fa-robot"></i></div>
-                    <span>AI Ideas</span>
-                </div>
-                <div class="tool-item">
-                    <div class="tool-icon glass-effect"><i class="fas fa-users"></i></div>
-                    <span>Competitors</span>
-                </div>
-                <div class="tool-item">
-                    <div class="tool-icon glass-effect"><i class="fas fa-clock"></i></div>
-                    <span>Best Time</span>
-                </div>
-                <div class="tool-item">
-                    <div class="tool-icon glass-effect"><i class="fas fa-search-dollar"></i></div>
-                    <span>Audit</span>
-                </div>
-            </div>
-        </section>
-
-        <!-- 3. Dashboard Preview Section -->
-        <section class="preview-section">
-            <h2 class="section-title">Grow faster without ever leaving <span class="gradient-text">YouTube</span></h2>
-            <p class="section-subtitle">See what success looks like and achieve your goals faster with data.</p>
-
-            <div class="dashboard-visual glass-effect">
-                <!-- Abstract UI Representation mimicking the screenshot's dashboard view -->
-                <div class="ui-header">
-                    <div class="ui-dot" style="background:#ff5f56"></div>
-                    <div class="ui-dot" style="background:#ffbd2e"></div>
-                    <div class="ui-dot" style="background:#27c93f"></div>
-                </div>
-                <div class="ui-body">
-                    <div class="ui-sidebar">
-                        <div class="skeleton-line short"></div>
-                        <div class="skeleton-line short"></div>
-                        <div class="skeleton-line short"></div>
+                <div
+                    style="margin-top:20px; height:150px; background:rgba(255,255,255,0.05); border-radius:10px; display:flex; align-items:flex-end; padding:10px; gap:10px;">
+                    <!-- Bars -->
+                    <div
+                        style="width:100%; background:var(--gradient-secondary); height:30%; opacity:0.3; border-radius:4px;">
                     </div>
-                    <div class="ui-content">
-                        <div class="ui-chart-area">
-                            <div class="skeleton-graph"></div>
-                        </div>
-                        <div class="ui-stats-row">
-                            <div class="skeleton-box"></div>
-                            <div class="skeleton-box"></div>
-                            <div class="skeleton-box"></div>
-                        </div>
+                    <div
+                        style="width:100%; background:var(--gradient-secondary); height:50%; opacity:0.5; border-radius:4px;">
                     </div>
-                </div>
-                <!-- Floating Element -->
-                <div class="ui-floating-card glass-effect">
-                    <i class="fas fa-arrow-up trend-up"></i>
-                    <span>+245% Views</span>
-                </div>
-            </div>
-
-            <div class="cta-center">
-                <a href="/dashboard" class="btn-primary-sm">See It In Action</a>
-            </div>
-        </section>
-
-        <!-- 4. Testimonial Grid -->
-        <section class="testimonial-grid-section">
-            <h2 class="section-title">Hear from real creators using <span class="gradient-text">AnalyticsPro</span></h2>
-
-            <div class="testimonials-masonry">
-                <!-- Existing ONE updated -->
-                <div class="testimony-card glass-effect">
-                    <div class="quote-icon"><i class="fas fa-quote-left"></i></div>
-                    <p class="testimony-text">"This analytics dashboard completely changed how I plan my content. The
-                        comparative insights are a game changer!"</p>
-                    <div class="testimony-author">
-                        <div class="avatar-placeholder">SP</div>
-                        <div class="author-details">
-                            <span class="name">Sarah Parker</span>
-                            <span class="role">Tech Reviewer (500k+)</span>
-                        </div>
+                    <div
+                        style="width:100%; background:var(--gradient-secondary); height:70%; opacity:0.7; border-radius:4px;">
                     </div>
-                </div>
-
-                <!-- New Dummy ONE -->
-                <div class="testimony-card glass-effect">
-                    <div class="quote-icon"><i class="fas fa-quote-left"></i></div>
-                    <p class="testimony-text">"I used to guess what would work. Now I know. The AI ideas are
-                        surprisingly accurate."</p>
-                    <div class="testimony-author">
-                        <div class="avatar-placeholder" style="background:var(--gradient-primary)">JD</div>
-                        <div class="author-details">
-                            <span class="name">John Doe</span>
-                            <span class="role">Gaming (1M+)</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- New Dummy TWO -->
-                <div class="testimony-card glass-effect">
-                    <div class="quote-icon"><i class="fas fa-quote-left"></i></div>
-                    <p class="testimony-text">"The competitor tracking feature helps me stay ahead of trends in my
-                        niche. Essential tool."</p>
-                    <div class="testimony-author">
-                        <div class="avatar-placeholder" style="background:#ff6b6b">AL</div>
-                        <div class="author-details">
-                            <span class="name">Ana Lee</span>
-                            <span class="role">Vlog (250k+)</span>
-                        </div>
+                    <div
+                        style="width:100%; background:var(--gradient-secondary); height:90%; opacity:0.9; border-radius:4px;">
                     </div>
                 </div>
             </div>
-        </section>
-
-        <!-- 5. Pricing Section -->
-        <section class="pricing-section">
-            <h2 class="section-title">Supercharge your growth <span class="gradient-text">today</span></h2>
-
-            <div class="pricing-grid">
-                <!-- Free Tier -->
-                <div class="pricing-card glass-effect">
-                    <h3>Free</h3>
-                    <div class="price">Free</div>
-                    <p class="price-desc">Forever free for basic analytics.</p>
-                    <ul class="features-list">
-                        <li><i class="fas fa-check"></i> 1 Channel Analysis</li>
-                        <li><i class="fas fa-check"></i> Basic Metrics</li>
-                        <li><i class="fas fa-check"></i> 3 Daily AI Ideas</li>
-                    </ul>
-                    <a href="/signup" class="btn-ghost"
-                        style="width:100%; display:block; text-align:center; padding:10px; margin-top:20px; border:1px solid rgba(255,255,255,0.2); border-radius:50px;">Sign
-                        Up Free</a>
-                </div>
-
-                <!-- Boost Tier -->
-                <div class="pricing-card glass-effect highlight-card">
-                    <div class="popular-tag">Most Popular</div>
-                    <h3>Boost</h3>
-                    <div class="price">$49<span class="period">/mo</span></div>
-                    <p class="price-desc">For serious creators growing fast.</p>
-                    <ul class="features-list">
-                        <li><i class="fas fa-check"></i> Unlimited Channels</li>
-                        <li><i class="fas fa-check"></i> Competitor Tracking</li>
-                        <li><i class="fas fa-check"></i> Unlimited AI Ideas</li>
-                        <li><i class="fas fa-check"></i> Export Data</li>
-                    </ul>
-                    <a href="/signup" class="btn-login-large"
-                        style="width:100%; display:block; text-align:center; margin-top:20px; font-size:1rem;">Get
-                        Boost</a>
-                </div>
-
-                <!-- Coaching Tier -->
-                <div class="pricing-card glass-effect">
-                    <h3>Coaching</h3>
-                    <div class="price">$199<span class="period">/mo</span></div>
-                    <p class="price-desc">1-on-1 expert guidance.</p>
-                    <ul class="features-list">
-                        <li><i class="fas fa-check"></i> Everything in Boost</li>
-                        <li><i class="fas fa-check"></i> Monthly Audit Call</li>
-                        <li><i class="fas fa-check"></i> Strategy Plan</li>
-                    </ul>
-                    <a href="#" class="btn-ghost"
-                        style="width:100%; display:block; text-align:center; padding:10px; margin-top:20px; border:1px solid rgba(255,255,255,0.2); border-radius:50px;">Contact
-                        Us</a>
-                </div>
+            <!-- Overlay -->
+            <div
+                style="position:absolute; inset:0; background:linear-gradient(to top, var(--bg-dark), transparent); pointer-events:none;">
             </div>
-        </section>
+            <div style="position:absolute; bottom:20px; left:50%; transform:translateX(-50%);">
+                <a href="/login" class="btn-primary">See Live Demo</a>
+            </div>
+        </div>
+    </section>
 
-        <footer>
-            <p>&copy; 2025 YouTube Analytics Project. Crafted with <i class="fas fa-heart" style="color:#ff6b6b"></i> by
-                Shailendra Mani Pandey.</p>
-        </footer>
-    </div>
-    <!-- Firebase SDKs (Modular) -->
-    <!-- Scripts updated to type="module" -->
-    <script type="module" src="js/auth.js"></script>
-    <script type="module" src="js/main.js"></script>
+    <!-- Testimonials -->
+    <section id="testimonials" class="testimony-section">
+        <h2>Used by Creators</h2>
+        <div
+            style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:20px; max-width:1000px; margin:0 auto;">
+            <div class="testimony-card">
+                <div class="user-info" style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+                    <img src="https://ui-avatars.com/api/?name=Alex+B&background=7C3AED&color=fff"
+                        style="width:50px; height:50px; border-radius:50%; border:2px solid white;">
+                    <div style="text-align:left;">
+                        <h4 style="margin:0;">Alex Brown</h4>
+                        <span style="font-size:0.8rem; color:var(--text-muted);">100K Subscribers</span>
+                    </div>
+                </div>
+                <p style="font-style:italic; color:var(--text-secondary);">"The competitor comparison tool changed my
+                    entire content strategy. I finally know what works."</p>
+            </div>
+            <div class="testimony-card">
+                <div class="user-info" style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+                    <img src="https://ui-avatars.com/api/?name=Sarah+J&background=EC4899&color=fff"
+                        style="width:50px; height:50px; border-radius:50%; border:2px solid white;">
+                    <div style="text-align:left;">
+                        <h4 style="margin:0;">Sarah Jenkins</h4>
+                        <span style="font-size:0.8rem; color:var(--text-muted);">Gaming Channel</span>
+                    </div>
+                </div>
+                <p style="font-style:italic; color:var(--text-secondary);">"Monthly reports help me show sponsors my
+                    real growth. Absolutely essential tool."</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section Removed -->
+
+    <!-- Footer -->
+    <footer
+        style="margin-top:50px; padding:40px; border-top:1px solid rgba(255,255,255,0.05); text-align:center; color:var(--text-muted); font-size:0.9rem;">
+        <p>&copy; 2024 AnalyticsPro. All rights reserved.</p>
+        <div style="margin-top:15px; display:flex; justify-content:center; gap:20px;">
+            <a href="#" style="color:var(--text-muted);">Privacy</a>
+            <a href="#" style="color:var(--text-muted);">Terms</a>
+            <a href="#" style="color:var(--text-muted);">Contact</a>
+        </div>
+    </footer>
+
 </body>
 
 </html>

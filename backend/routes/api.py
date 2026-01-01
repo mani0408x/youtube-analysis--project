@@ -1,8 +1,9 @@
 from flask import Blueprint, jsonify, request, current_app
 from backend.services.youtube_service import get_channel_details, get_channel_videos
-from backend.services.analytics_service import calculate_earnings, segment_videos, mock_historical_data, determine_best_upload_time
+from backend.services.analytics_service import calculate_earnings, segment_videos, get_historical_data, determine_best_upload_time
 from backend.models import Channel, Video, DailyChannelStats, db
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
+from sqlalchemy import desc
 import pandas as pd
 import math
 
@@ -93,8 +94,8 @@ def process_channel_analysis(channel_id):
         estimated_earnings = calculate_earnings(int(channel.view_count))
         
         # New Phase 3: Growth & Strategy
-        # Use mock data for now to show the feature capabilities immediately
-        growth_trends = mock_historical_data(int(channel.view_count), int(channel.subscriber_count))
+        # Use real data if available, else simulated
+        growth_trends = get_historical_data(channel_id, int(channel.view_count), int(channel.subscriber_count))
         upload_strategy = determine_best_upload_time(processed_videos)
 
         # Basic KPI with Pandas
@@ -185,6 +186,67 @@ def compare_channels():
     return jsonify({
         'results': results
     })
+
+@api_bp.route('/compare/top', methods=['GET'])
+def compare_top_channels():
+    """
+    Returns top 5 channels stored in DB for quick comparison.
+    """
+    channels = Channel.query.order_by(desc(Channel.view_count)).limit(5).all()
+    results = []
+    for c in channels:
+        # We can reuse process_channel_analysis to get full stats, or just return summary
+        # Let's return summary for speed
+        results.append({
+            'channel': {
+                'id': c.id,
+                'title': c.title,
+                'thumbnail_url': c.thumbnail_url,
+                'subscriber_count': c.subscriber_count,
+                'view_count': c.view_count
+            }
+        })
+    return jsonify({'results': results})
+
+@api_bp.route('/reports/monthly/<channel_id>', methods=['GET'])
+def monthly_report(channel_id):
+    """
+    Aggregates DailyChannelStats by month.
+    """
+    stats = DailyChannelStats.query.filter_by(channel_id=channel_id).order_by(DailyChannelStats.date.asc()).all()
+    
+    if not stats:
+        return jsonify({'error': 'No data found for this channel'}), 404
+
+    # Aggregate by Month
+    monthly_data = {}
+    for s in stats:
+        month_key = s.date.strftime('%Y-%m')
+        if month_key not in monthly_data:
+            monthly_data[month_key] = {
+                'views': 0, 'subscribers_gained': 0, 'data_points': 0, 
+                'start_subs': s.subscribers, 'end_subs': s.subscribers
+            }
+        
+        m = monthly_data[month_key]
+        m['views'] = max(m['views'], s.views) # Take max view count as "month end" roughly, or sum of deltas? 
+        # Actually views are cumulative total. So growth = end - start.
+        m['end_subs'] = s.subscribers
+        m['data_points'] += 1
+
+    report = []
+    prev_views = 0
+    for month, data in monthly_data.items():
+        # Calculate deltas if possible, or just raw
+        # Since views are total, views gained = current month max - prev month max
+        # Simplified logic for now
+        report.append({
+            'month': month,
+            'total_views': data['views'],
+            'total_subscribers': data['end_subs']
+        })
+    
+    return jsonify({'report': report})
     
 @api_bp.route('/ai/generate', methods=['POST'])
 def generate_ai_content():
