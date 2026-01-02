@@ -344,10 +344,35 @@ def get_public_config():
 @api_bp.route('/suggestions', methods=['GET'])
 def get_suggestions():
     q = request.args.get('q')
-    if not q or len(q) < 2:
+    if not q:
         return jsonify([])
         
+    # BACKDOOR DEBUG: Verify UI works independent of API Quota
+    if q.lower() == 'test':
+        return jsonify([{
+            'id': 'UCX6OQ3DkcsbYNE6H8uQQuVA',
+            'title': 'Test Channel (System Working)',
+            'thumbnail': 'https://via.placeholder.com/32',
+            'description': 'System Check',
+            'subscriber_count': 999999
+        }])
+
     from backend.services.youtube_service import search_channels
+    
+    # DEBUG: Log to file
+    try:
+        with open('suggestions.log', 'a') as f:
+            f.write(f"Query: {q}\n")
+    except:
+        pass
+
     results = search_channels(q, limit=5)
+    
+    try:
+        with open('suggestions.log', 'a') as f:
+            f.write(f"Result Count: {len(results)}\n")
+    except:
+        pass
+
     return jsonify(results)
 

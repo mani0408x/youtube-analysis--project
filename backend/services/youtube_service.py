@@ -91,6 +91,12 @@ def search_channels(query, limit=5):
     Searches for channels by name and returns a list of candidates with details.
     """
     youtube = get_youtube_client()
+    
+    # Check if client is properly initialized
+    if not current_app.config.get('YOUTUBE_API_KEY'):
+        print("ERROR: YOUTUBE_API_KEY is missing in config/env")
+        return []
+
     try:
         # 1. Search for channels
         search_response = youtube.search().list(
@@ -149,7 +155,9 @@ def search_channels(query, limit=5):
                 
         return candidates
     except Exception as e:
-        print(f"Error searching channel: {e}")
+        print(f"CRITICAL API ERROR: {type(e).__name__}: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return []
 
 def resolve_channel_input(input_str):

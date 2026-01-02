@@ -1,0 +1,8 @@
+Starting Debug Script...
+CWD: C:\Users\asus\OneDrive\Desktop\updated yt analysis\youtube-analysis--project
+Flask App Created and Config Loaded.
+API Key Present: Yes
+API Key (masked): AIza...FNlA
+Searching for: google
+Results Type: <class 'list'>
+Results: [{'id': 'UC_fyAp919RnkKmBrMXGwnUQ', 'title': 'Google Career Certificates', 'thumbnail': 'https://yt3.ggpht.com/phOh52Z_wStti0KnJ4E7fEBqRfhdqY6oBY2UEdXK3kRcgzVdpFBm0SgenF4okVK9HL3QQXuMQg=s88-c-k-c0x00ffffff-no-rj', 'description': 'New course alert! Make AI Work for You is available now.\n\n', 'subscriber_count': 707000}, {'id': 'UC_x5XG1OV2P6uZZ5FSM9Ttw', 'title': 'Google for Developers', 'thumbnail': 'https://yt3.ggpht.com/WZ_63J_-745xyW_DGxGi3VUyTZAe0Jvhw2ZCg7fdz-tv9esTbNPZTFR9X79QzA0ArIrMjYJCDA=s88-c-k-c0x00ffffff-no-rj', 'description': 'Subscribe to join a community of creative developers and learn the latest in Google technology — from AI and cloud, to mobile and web.\n\nExplore more at developers.google.com\n\n', 'subscriber_count': 2590000}, {'id': 'UCK8sQmJBp8GCxrOtXWBpyEA', 'title': 'Google', 'thumbnail': 'https://yt3.ggpht.com/XTtKCJHWPqDVU8lipZZ2aJtjGMqUAhV674hpgOLVkUYXgrVRqbPCzrDW79f9HManNG330tYxvw=s88-c-k-c0x00ffffff-no-rj', 'description': 'Stranger Things in Search is here 🚲 See the trends that shaped the past decade.\n', 'subscriber_count': 13800000}]

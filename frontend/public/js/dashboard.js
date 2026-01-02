@@ -220,7 +220,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
             timeout = setTimeout(async () => {
                 try {
+                    // Show loading
+                    list.innerHTML = '<div style="padding:10px 15px; color:var(--text-secondary); font-size:0.9rem;">Loading...</div>';
+                    list.style.display = 'block';
+
+                    // console.log("Fetching suggestions for:", q); 
                     const res = await fetch(`/api/suggestions?q=${encodeURIComponent(q)}`);
+
+                    if (!res.ok) {
+                        throw new Error(`Server Error: ${res.status}`);
+                    }
+
                     const suggestions = await res.json();
 
                     if (suggestions.length > 0) {
@@ -240,20 +250,14 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                          `).join('');
                         list.style.display = 'block';
-                        // Force visibility check
 
-                        // Click Handlers
+                        // Force Click Handlers Re-attach
                         list.querySelectorAll('.suggestion-item').forEach(item => {
                             item.addEventListener('click', (e) => {
                                 e.stopPropagation();
-
-                                // UPDATE: Show Title, Store ID
                                 input.value = item.getAttribute('data-title');
                                 input.dataset.resolvedId = item.getAttribute('data-id');
-
                                 list.style.display = 'none';
-
-                                // Auto-trigger analysis
                                 const analyzeBtn = document.getElementById('analyze-btn');
                                 if (analyzeBtn) analyzeBtn.click();
                             });
@@ -261,12 +265,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     } else {
                         // Show "No results" gracefully
-                        list.innerHTML = `<div style="padding:10px 15px; color:var(--text-muted); font-size:0.9rem;">No channels found</div>`;
+                        list.innerHTML = `<div style="padding:10px 15px; color:var(--text-muted); font-size:0.9rem;">No channels found for "${q}"</div>`;
                         list.style.display = 'block';
                     }
                 } catch (e) {
-                    // Silent fail as per requirements (hide suggestions)
-                    list.style.display = 'none';
+                    console.error("Suggestion Error:", e);
+                    list.innerHTML = `<div style="padding:10px 15px; color:var(--text-error, red); font-size:0.9rem;">Error fetching suggestions.</div>`;
+                    list.style.display = 'block';
                 }
             }, 300); // Debounce 300ms
         });
@@ -829,6 +834,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Hide specific analytics elements for Comparison Mode
+        // We need to hide the Growth Chart container specifically as requested
+        const growthChartEl = document.getElementById('growthChart');
+        if (growthChartEl) growthChartEl.parentElement.style.display = 'none';
+
         const analyticsSection = document.getElementById('section-analytics');
         if (analyticsSection) {
             const h2 = analyticsSection.querySelector('h2');
@@ -838,8 +847,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (stratChart) stratChart.parentElement.style.display = 'none'; // Hide "Best Upload Time"
 
         // Charts for Comparison
-        // We need to adapt renderCharts to accept multi-dataset or just show a simple comparison chart manually here using the existing canvas
-        // For Phase 2/3 simplicity, let's just show Views Comparison in the first chart slot
         ['viewsChart', 'engagementChart', 'growthChart', 'uploadStrategyChart'].forEach(id => {
             if (charts[id]) charts[id].destroy();
         });
@@ -848,14 +855,21 @@ document.addEventListener('DOMContentLoaded', () => {
         charts['viewsChart'] = new Chart(ctxViews, {
             type: 'bar',
             data: {
-                labels: ['Avg Views'],
+                labels: ['Engagement Rate (%)'],
                 datasets: results.map((res, idx) => ({
                     label: res.channel.title,
-                    data: [res.kpis.avg_views],
-                    backgroundColor: idx === 0 ? 'rgba(54, 162, 235, 0.6)' : 'rgba(255, 99, 132, 0.6)'
+                    data: [res.kpis.engagement_rate],
+                    backgroundColor: idx === 0 ? 'rgba(54, 162, 235, 0.6)' : 'rgba(255, 99, 132, 0.6)',
+                    borderColor: idx === 0 ? 'rgba(54, 162, 235, 1)' : 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
                 }))
             },
-            options: { responsive: true }
+            options: {
+                responsive: true,
+                plugins: {
+                    title: { display: true, text: 'Engagement Comparison', font: { size: 16 } }
+                }
+            }
         });
 
         const ctxEng = document.getElementById('engagementChart').getContext('2d');
@@ -878,10 +892,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // 2. Engagement Comparison Chart (Bar)
-        const engContainer = document.getElementById('engagementChart').parentElement;
-        engContainer.querySelector('h3').innerText = "Likes & Comments Comparison"; // Update Title
-        engContainer.style.display = 'block';
-
         charts['engagementChart'] = new Chart(ctxEng, {
             type: 'bar',
             data: {
@@ -897,8 +907,7 @@ document.addEventListener('DOMContentLoaded', () => {
             options: {
                 responsive: true,
                 plugins: {
-                    title: { display: false }, // Title now in H3
-                    legend: { position: 'bottom' }
+                    title: { display: true, text: 'Engagement per Video', color: '#9ca3af' }
                 },
                 scales: {
                     y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } },
@@ -907,37 +916,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // 3. Engagement Rate Comparison (Repurposing Growth Chart Slot)
-        const growthContainer = document.getElementById('growthChart').parentElement;
-        if (growthContainer) {
-            growthContainer.style.display = 'block'; // Unhide
-            growthContainer.querySelector('h3').innerText = "Engagement Rate Comparison"; // Rename
-
-            const ctxGrowth = document.getElementById('growthChart').getContext('2d');
-            charts['growthChart'] = new Chart(ctxGrowth, {
-                type: 'bar',
-                data: {
-                    labels: ['Engagement Rate (%)'],
-                    datasets: results.map((res, idx) => ({
-                        label: res.channel.title,
-                        data: [res.kpis.engagement_rate],
-                        backgroundColor: idx === 0 ? 'rgba(75, 192, 192, 0.6)' : 'rgba(153, 102, 255, 0.6)',
-                        borderColor: idx === 0 ? 'rgba(75, 192, 192, 1)' : 'rgba(153, 102, 255, 1)',
-                        borderWidth: 1
-                    }))
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: { position: 'bottom' }
-                    },
-                    scales: {
-                        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } },
-                        x: { grid: { display: false } }
-                    }
-                }
-            });
-        }
+        // Ensure container is visible
+        document.getElementById('engagementChart').parentElement.style.display = 'block';
 
         // Hide Table
         document.querySelector('.table-container').parentElement.style.display = 'none';
