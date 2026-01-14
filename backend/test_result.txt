@@ -1,0 +1,8 @@
+Starting Tests
+Running test_endpoint_reachable...
+Status: 500
+Result: PASS - Endpoint found
+Running test_mock_success...
+Mock Response Status: 200
+Result: PASS - Mock Success
+Tests Completed

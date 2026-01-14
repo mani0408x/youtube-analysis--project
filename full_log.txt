@@ -1,0 +1,147 @@
+commit 880d32952d1f6d19e37a8e6a498d00621340a5ef
+Author: mani0408x <maniupgkp@gmail.com>
+Date:   Thu Jan 15 02:17:18 2026 +0530
+
+    Refactor: Update project structure, fix gitignore, and sanitize example config
+
+ .gitignore                                |    22 +-
+ backend/app.py                            |    14 +
+ backend/config.py                         |    21 +
+ backend/models.py                         |    54 +
+ backend/requirements.txt                  |     4 +
+ backend/routes/api.py                     |   384 +
+ backend/routes/auth.py                    |   227 +
+ backend/services/ai_service.py            |    67 +
+ backend/services/analytics_service.py     |   138 +
+ backend/services/gemini_ai_service.py     |   119 +
+ backend/services/youtube_service.py       |   177 +
+ backend/test_app_result.txt               |     9 +
+ backend/test_gemini_app_integration.py    |    68 +
+ backend/test_gemini_integration_manual.py |    80 +
+ backend/test_result.txt                   |     8 +
+ backend/test_youtube_service_debug.py     |    47 +
+ frontend/public/css/style.css             |    38 +
+ frontend/public/dashboard.html            |   235 +
+ frontend/public/index.html                |    55 +
+ frontend/public/js/auth.js                |    11 +
+ frontend/public/js/dashboard.js           |   934 +++
+ git_log.txt                               |     5 +
+ git_status.txt                            | 10521 ++++++++++++++++++++++++++++
+ git_status_2.txt                          |    42 +
+ init_db.py                                |    42 +
+ project-context.txt                       |   137 +
+ run.py                                    |    18 +
+ secret_scan_result.txt                    |     3 +
+ test_output.txt                           |   Bin 0 -> 28 bytes
+ tests/test_analysis_debug.py              |    46 +
+ tests/test_analysis_file_log.py           |    66 +
+ tests/test_auth_mock.py                   |    57 +
+ tests/test_suggestions_api.py             |    27 +
+ tests/verify_features.py                  |   109 +
+ 34 files changed, 13773 insertions(+), 12 deletions(-)
+
+commit ecf7841abaa670c9c21652a40483d58cba5851c1
+Author: mani0408x <maniupgkp@gmail.com>
+Date:   Thu Jan 15 02:05:45 2026 +0530
+
+    update11
+
+ final_tree_check.txt | Bin 0 -> 1618 bytes
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+
+commit 1282845e2f3a75cd58995c91b3ca77d6396e08bd
+Author: mani0408x <maniupgkp@gmail.com>
+Date:   Thu Jan 15 01:39:31 2026 +0530
+
+    update
+
+ ACTUAL_TREE_CONTENT.txt     | 20988 ------------------------------------------
+ bad_commits_report.txt      |   Bin 1154 -> 0 bytes
+ bad_commits_report_utf8.txt |    12 -
+ check_tree_exhaustive.py    |    26 -
+ convert_final_fix.py        |    17 -
+ convert_reports.py          |    19 -
+ deep_check_output.txt       |   Bin 2524 -> 0 bytes
+ deep_git_check.py           |    42 -
+ final_fix_head.py           |    39 -
+ final_fix_output.txt        |   Bin 3414792 -> 0 bytes
+ final_fix_output_utf8.txt   | 20964 -----------------------------------------
+ final_verify_v2.py          |    23 +
+ find_bad_commits.py         |    37 -
+ global_env_scan.py          |    30 -
+ global_scan_report.txt      |   Bin 2422 -> 0 bytes
+ global_scan_report_utf8.txt |    24 -
+ orphan_output.txt           |     0
+ orphan_purge.py             |    46 -
+ read_bad_report.py          |    19 -
+ read_deep_check.py          |    22 -
+ read_trace.py               |    22 -
+ run.py                      |    17 +-
+ scan_for_secrets.py         |    41 +
+ search_env_history.py       |    33 -
+ trace_output.txt            |   Bin 2212 -> 0 bytes
+ trace_output_utf8.txt       |    38 -
+ trace_secrets.py            |    20 -
+ verification_check.txt      |   Bin 0 -> 952 bytes
+ verify_final_repo.py        |    27 +
+ 29 files changed, 98 insertions(+), 42408 deletions(-)
+
+commit b8bbab4ca9fb0cf9f34664205ee3e7db984ab2b8
+Author: mani0408x <maniupgkp@gmail.com>
+Date:   Thu Jan 15 01:32:53 2026 +0530
+
+    Initial clean commit (Refactored & Secured)
+
+ .gitignore                              |    51 +
+ ACTUAL_TREE_CONTENT.txt                 | 20988 ++++++++++++++++++++++++++++++
+ backend/__init__.py                     |     0
+ backend/app.py                          |    63 +
+ backend/config.py                       |    29 +
+ backend/extensions.py                   |     7 +
+ backend/models.py                       |    38 +
+ backend/requirements.txt                |    16 +
+ backend/routes/__init__.py              |     0
+ backend/routes/api.py                   |   386 +
+ backend/routes/auth.py                  |   142 +
+ backend/seed_mappings.py                |    77 +
+ backend/services/__init__.py            |     0
+ backend/services/huggingface_service.py |    92 +
+ backend/services/youtube_service.py     |   101 +
+ bad_commits_report.txt                  |   Bin 0 -> 1154 bytes
+ bad_commits_report_utf8.txt             |    12 +
+ check_tree_exhaustive.py                |    26 +
+ convert_final_fix.py                    |    17 +
+ convert_reports.py                      |    19 +
+ deep_check_output.txt                   |   Bin 0 -> 2524 bytes
+ deep_git_check.py                       |    42 +
+ final_fix_head.py                       |    39 +
+ final_fix_output.txt                    |   Bin 0 -> 3414792 bytes
+ final_fix_output_utf8.txt               | 20964 +++++++++++++++++++++++++++++
+ find_bad_commits.py                     |    37 +
+ frontend/public/css/design_tokens.css   |    35 +
+ frontend/public/css/style.css           |   824 ++
+ frontend/public/dashboard.html          |   383 +
+ frontend/public/images/author.jpg       |   Bin 0 -> 70477 bytes
+ frontend/public/index.html              |   329 +
+ frontend/public/js/auth.js              |   197 +
+ frontend/public/js/dashboard.js         |   725 ++
+ frontend/public/js/landing.js           |    92 +
+ frontend/public/js/main.js              |    18 +
+ frontend/public/login.html              |   256 +
+ global_env_scan.py                      |    30 +
+ global_scan_report.txt                  |   Bin 0 -> 2422 bytes
+ global_scan_report_utf8.txt             |    24 +
+ orphan_output.txt                       |     0
+ orphan_purge.py                         |    46 +
+ package.json                            |    13 +
+ read_bad_report.py                      |    19 +
+ read_deep_check.py                      |    22 +
+ read_trace.py                           |    22 +
+ run.py                                  |    12 +
+ run_server.bat                          |     2 +
+ search_env_history.py                   |    33 +
+ tests/test_auth_flow.py                 |    66 +
+ trace_output.txt                        |   Bin 0 -> 2212 bytes
+ trace_output_utf8.txt                   |    38 +
+ trace_secrets.py                        |    20 +
+ 52 files changed, 46352 insertions(+)

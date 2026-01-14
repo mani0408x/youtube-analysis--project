@@ -1,0 +1,9 @@
+Init
+App created successfully
+Running test_blueprint_registered...
+RESULT: PASS - Endpoint found in url_map
+App created successfully
+Running test_endpoint_live...
+Response Status: 400
+RESULT: PASS - Endpoint handled request (400 returned)
+Tests Finished

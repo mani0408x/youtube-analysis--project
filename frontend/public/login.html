@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - YouTube Analytics</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Google Identity -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+        .auth-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .auth-card {
+            background: var(--gradient-glass);
+            border: var(--glass-border);
+            border-radius: var(--radius-lg);
+            padding: 40px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .auth-header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .auth-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 25px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 10px 20px;
+            color: var(--text-secondary);
+            font-size: 1rem;
+            cursor: pointer;
+            position: relative;
+            transition: color 0.3s;
+        }
+
+        .tab-btn.active {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--gradient-primary);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-md);
+            color: white;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus {
+            border-color: #FF6B6B;
+            /* Approx primary color */
+        }
+
+        .btn-auth {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            font-size: 1rem;
+        }
+
+        .divider {
+            margin: 25px 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .divider span {
+            position: relative;
+            background: #0f0f13;
+            /* Match body bg approx */
+            padding: 0 10px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* Modal-like sections */
+        .auth-section {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .auth-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .google-btn-wrapper {
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="logo">
+                    <i class="fab fa-youtube"></i> Analytics<span class="highlight">Pro</span>
+                </div>
+                <p style="color: var(--text-secondary)">Access your channel insights</p>
+            </div>
+
+            <div class="auth-tabs">
+                <button class="tab-btn active" onclick="switchTab('login')">Sign In</button>
+                <button class="tab-btn" onclick="switchTab('signup')">Sign Up</button>
+            </div>
+
+            <!-- Login Form -->
+            <div id="login-section" class="auth-section active">
+                <form id="login-form">
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" class="form-input" id="login-email" required placeholder="name@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" class="form-input" id="login-password" required
+                            placeholder="Enter your password">
+                    </div>
+                    <button type="submit" class="btn-primary btn-auth">Sign In</button>
+                </form>
+            </div>
+
+            <!-- Signup Form -->
+            <div id="signup-section" class="auth-section">
+                <form id="signup-form">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" class="form-input" id="signup-name" required placeholder="John Doe">
+                    </div>
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" class="form-input" id="signup-email" required
+                            placeholder="name@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" class="form-input" id="signup-password" required
+                            placeholder="Create a strong password">
+                    </div>
+                    <button type="submit" class="btn-primary btn-auth">Create Account</button>
+                </form>
+            </div>
+
+            <div class="divider">
+                <span>OR CONTINUE WITH</span>
+            </div>
+
+            <div class="google-btn-wrapper">
+                <!-- Google Button Container -->
+                <div id="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="filled_black"
+                    data-text="signin_with" data-size="large" data-logo_alignment="left">
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script type="module" src="js/auth.js"></script>
+    <script>
+        // Simple Tab Switching Logic (Inline for speed, or move to auth.js)
+        window.switchTab = (tab) => {
+            const loginSection = document.getElementById('login-section');
+            const signupSection = document.getElementById('signup-section');
+            const btns = document.querySelectorAll('.tab-btn');
+
+            if (tab === 'login') {
+                loginSection.classList.add('active');
+                signupSection.classList.remove('active');
+                btns[0].classList.add('active');
+                btns[1].classList.remove('active');
+            } else {
+                loginSection.classList.remove('active');
+                signupSection.classList.add('active');
+                btns[0].classList.remove('active');
+                btns[1].classList.add('active');
+            }
+        }
+    </script>
+</body>
+
+</html>

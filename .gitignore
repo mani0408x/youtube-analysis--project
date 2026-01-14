@@ -1,0 +1,49 @@
+# Environments & Secrets
+.env
+.env*
+.flaskenv
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Flask & Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+instance/
+.webassets-cache
+.pytest_cache/
+coverage.xml
+*.log
+
+# Databases
+*.db
+*.sqlite
+
+# Node / Frontend
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dist/
+build/
+.next/
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# API Tokens & Secrets
+*.token
+*.key
+firebase-adminsdk.json

@@ -1,0 +1,35 @@
+:root {
+    /* Base Colors */
+    --bg-dark: #0f0f13;
+    --bg-card: rgba(255, 255, 255, 0.05);
+    --bg-card-hover: rgba(255, 255, 255, 0.1);
+    
+    /* Text Colors */
+    --text-primary: #ffffff;
+    --text-secondary: #a0a0b0;
+    --text-muted: #6c6c7d;
+
+    /* Brand Gradients */
+    --gradient-primary: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%); /* Warm/Orange (YouTube-ish but modern) */
+    --gradient-accent: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); /* Blue/Cyan */
+    --gradient-glass: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
+
+    /* Functional Colors */
+    --success: #00dd88;
+    --danger: #ff4757;
+    --warning: #ffa502;
+    --info: #2e86de;
+
+    /* Glass Effect */
+    --glass-border: 1px solid rgba(255, 255, 255, 0.08);
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    --backdrop-blur: blur(12px);
+
+    /* Spacing & Layout */
+    --radius-md: 16px;
+    --radius-lg: 24px;
+    --spacing-xs: 8px;
+    --spacing-sm: 16px;
+    --spacing-md: 24px;
+    --spacing-lg: 32px;
+}
