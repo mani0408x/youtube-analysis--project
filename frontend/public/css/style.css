@@ -215,7 +215,6 @@ html {
     display: flex;
     justify-content: space-between;
     align-items: center;
-<<<<<<< HEAD
     padding: 15px 30px;
     background: rgba(18, 18, 22, 0.85);
     /* Slightly richer dark */
@@ -266,18 +265,6 @@ html {
     background-clip: text;
     color: transparent;
     /* Fallback */
-=======
-    margin-bottom: var(--spacing-lg);
-    background: var(--bg-card);
-    padding: 15px 20px;
-    border-radius: var(--radius-md);
-    border: var(--glass-border);
-    border: var(--glass-border);
-    backdrop-filter: blur(10px);
-    z-index: 1000;
-    position: relative;
-    /* Ensure stacking context */
->>>>>>> 82fa5d1b9167d5712274c819447d13bfca8fbb70
 }
 
 /* New Input Styles */
@@ -285,11 +272,7 @@ html {
     background: var(--gradient-glass);
     /* Glass container */
     border: var(--glass-border);
-<<<<<<< HEAD
     border-radius: 12px;
-=======
-    border-radius: var(--radius-md);
->>>>>>> 82fa5d1b9167d5712274c819447d13bfca8fbb70
     /* Rectangular-ish with small radius */
     padding: 15px;
     display: flex;
@@ -297,32 +280,19 @@ html {
     width: 40%;
     max-width: 400px;
     /* Remove rounding */
-<<<<<<< HEAD
-=======
-    border-radius: 8px;
->>>>>>> 82fa5d1b9167d5712274c819447d13bfca8fbb70
 }
 
 .search-container input,
 .glass-input {
-<<<<<<< HEAD
     background: #13131a !important;
     /* Force dark background */
     border: 1px solid rgba(255, 255, 255, 0.1);
     color: #f0f0f0 !important;
-=======
-    background: #000;
-    /* Black background */
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    /* Rectangular border */
-    color: white;
->>>>>>> 82fa5d1b9167d5712274c819447d13bfca8fbb70
     width: 100%;
     margin-left: 0;
     /* Reset margin */
     outline: none;
     font-size: 0.95rem;
-<<<<<<< HEAD
     padding: 12px 18px;
     /* More breathing room */
     border-radius: 12px;
@@ -345,11 +315,6 @@ input:-webkit-autofill:active {
     -webkit-box-shadow: 0 0 0 30px #13131a inset !important;
     -webkit-text-fill-color: white !important;
     transition: background-color 5000s ease-in-out 0s;
-=======
-    padding: 10px 15px;
-    border-radius: 4px;
-    /* Slight radius but mostly rectangular */
->>>>>>> 82fa5d1b9167d5712274c819447d13bfca8fbb70
 }
 
 /* Autocomplete Suggestions */
@@ -776,7 +741,6 @@ input:-webkit-autofill:active {
         width: 100%;
         /* Full width search on mobile */
     }
-<<<<<<< HEAD
 
     .landing-search-container {
         width: 100%;
@@ -857,6 +821,4 @@ input:-webkit-autofill:active {
 .read-more:hover {
     gap: 12px;
     color: var(--primary-color);
-=======
->>>>>>> 82fa5d1b9167d5712274c819447d13bfca8fbb70
 }

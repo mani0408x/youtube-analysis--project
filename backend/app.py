@@ -28,33 +28,25 @@ def create_app(config_class=Config):
         db.create_all()
 
     # Register blueprints
-<<<<<<< HEAD
-    from backend.routes.auth import auth_bp
-    from backend.routes.api import api_bp
-    app.register_blueprint(auth_bp)
-    app.register_blueprint(api_bp)
-    
-    # from backend.services.gemini_ai_service import gemini_bp
-    # app.register_blueprint(gemini_bp)
-    
-    from backend.services.huggingface_service import hf_bp
-    app.register_blueprint(hf_bp)
-=======
     from backend.routes.auth import auth_bp, init_oauth
     from backend.routes.api import api_bp
+    
     init_oauth(app)
     app.register_blueprint(auth_bp)
     app.register_blueprint(api_bp)
     
-    from backend.services.gemini_ai_service import gemini_bp
-    app.register_blueprint(gemini_bp)
->>>>>>> 82fa5d1b9167d5712274c819447d13bfca8fbb70
+    # Hugging Face Service (Preferred)
+    from backend.services.huggingface_service import hf_bp
+    app.register_blueprint(hf_bp)
+    
+    # Gemini Service - Disabled
+    # from backend.services.gemini_ai_service import gemini_bp
+    # app.register_blueprint(gemini_bp)
 
     @app.route('/health')
     def health_check():
         return {'status': 'healthy'}, 200
 
-<<<<<<< HEAD
     # Global JSON Error Handlers
     @app.errorhandler(404)
     def not_found(e):
@@ -68,8 +60,6 @@ def create_app(config_class=Config):
     def internal_error(e):
         return {'error': 'Internal system error'}, 500
 
-=======
->>>>>>> 82fa5d1b9167d5712274c819447d13bfca8fbb70
     return app
 
 if __name__ == '__main__':

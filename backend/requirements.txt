@@ -1,11 +1,7 @@
 Flask==3.0.0
 Flask-SQLAlchemy==3.1.1
 Flask-Cors==4.0.0
-<<<<<<< HEAD
-
-=======
 PyMySQL==1.1.0
->>>>>>> 82fa5d1b9167d5712274c819447d13bfca8fbb70
 google-api-python-client==2.111.0
 google-auth-oauthlib==1.2.0
 google-auth-httplib2==0.2.0

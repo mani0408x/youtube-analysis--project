@@ -4,35 +4,6 @@ from flask import current_app
 from datetime import datetime, timedelta
 import isodate
 
-<<<<<<< HEAD
-# create youtube client using api key
-def get_youtube_client():
-    return build('youtube', 'v3', developerKey=current_app.config['YOUTUBE_API_KEY'])
-
-# get channel info from id or name
-def get_channel_details(channel_input=None, mine=False):
-    youtube = get_youtube_client()
-    
-    if mine:
-        res = youtube.channels().list(part="snippet,contentDetails,statistics", mine=True).execute()
-        items = res.get('items', [])
-        return _format_channel_data(items[0]) if items else None
-
-    channel_id = channel_input
-    # if it doesn't look like an ID, search for it
-    if not (channel_input.startswith('UC') and len(channel_input) == 24):
-        search_res = youtube.search().list(part="snippet", type="channel", q=channel_input, maxResults=1).execute()
-        items = search_res.get('items', [])
-        if not items: return None
-        channel_id = items[0]['snippet']['channelId']
-
-    res = youtube.channels().list(part="snippet,contentDetails,statistics", id=channel_id).execute()
-    items = res.get('items', [])
-    return _format_channel_data(items[0]) if items else None
-
-def _format_channel_data(item):
-    # helper to clean up the response
-=======
 def get_youtube_client():
     return build('youtube', 'v3', developerKey=current_app.config['YOUTUBE_API_KEY'])
 
@@ -63,7 +34,6 @@ def get_channel_details(channel_id=None, mine=False, for_username=None):
         return None
         
     item = items[0]
->>>>>>> 82fa5d1b9167d5712274c819447d13bfca8fbb70
     return {
         'id': item['id'],
         'title': item['snippet']['title'],
@@ -75,47 +45,25 @@ def get_channel_details(channel_id=None, mine=False, for_username=None):
         'uploads_playlist': item['contentDetails']['relatedPlaylists']['uploads']
     }
 
-<<<<<<< HEAD
-# get list of videos from a playlist
 def get_channel_videos(playlist_id, max_results=50, page_token=None):
     youtube = get_youtube_client()
-    
-    res = youtube.playlistItems().list(
-        part="snippet,contentDetails", 
-        playlistId=playlist_id, 
-        maxResults=max_results, 
-        pageToken=page_token
-    ).execute()
-    
-    token = res.get('nextPageToken')
-    ids = [i['contentDetails']['videoId'] for i in res.get('items', [])]
-    
-    if not ids: return {'videos': [], 'next_page_token': None}
-
-    # get stats for each video
-    stats_res = youtube.videos().list(part="statistics,contentDetails,snippet", id=','.join(ids)).execute()
-    
     videos = []
-    for item in stats_res.get('items', []):
-=======
-def get_channel_videos(playlist_id, max_results=50):
-    youtube = get_youtube_client()
-    videos = []
-    next_page_token = None
     
     # limiting to one page for MVP/demo purposes
     request = youtube.playlistItems().list(
         part="snippet,contentDetails",
         playlistId=playlist_id,
         maxResults=max_results,
-        pageToken=next_page_token
+        pageToken=page_token
     )
     response = request.execute()
+    
+    next_page_token = response.get('nextPageToken')
     
     video_ids = [item['contentDetails']['videoId'] for item in response.get('items', [])]
     
     if not video_ids:
-        return []
+        return [], None
 
     # Fetch stats for these videos
     stats_request = youtube.videos().list(
@@ -125,7 +73,6 @@ def get_channel_videos(playlist_id, max_results=50):
     stats_response = stats_request.execute()
     
     for item in stats_response.get('items', []):
->>>>>>> 82fa5d1b9167d5712274c819447d13bfca8fbb70
         duration = isodate.parse_duration(item['contentDetails']['duration'])
         videos.append({
             'id': item['id'],
@@ -136,38 +83,8 @@ def get_channel_videos(playlist_id, max_results=50):
             'like_count': int(item['statistics'].get('likeCount', 0)),
             'comment_count': int(item['statistics'].get('commentCount', 0))
         })
-<<<<<<< HEAD
-    
-    videos.sort(key=lambda x: x['published_at'], reverse=True)
-    return {'videos': videos, 'next_page_token': token}
-
-# search for channels by query
-def search_channels(query, limit=5):
-    youtube = get_youtube_client()
-    try:
-        res = youtube.search().list(q=query, type='channel', part='id,snippet', maxResults=limit).execute()
-        ids = [i['id']['channelId'] for i in res.get('items', [])]
-        if not ids: return []
-
-        details = youtube.channels().list(part='statistics,snippet', id=','.join(ids)).execute()
         
-        results = []
-        for d in details.get('items', []):
-            results.append({
-                'id': d['id'],
-                'title': d['snippet']['title'],
-                'thumbnail': d['snippet']['thumbnails'].get('default', {}).get('url'),
-                'description': d['snippet']['description'],
-                'subscriber_count': int(d['statistics'].get('subscriberCount', 0))
-            })
-        return results
-    except:
-        return []
-=======
-        
-    return videos
-
-
+    return videos, next_page_token
 
 def search_channels(query, limit=5):
     """
@@ -275,4 +192,3 @@ def resolve_channel_input(input_str):
         return None
         
     return candidates
->>>>>>> 82fa5d1b9167d5712274c819447d13bfca8fbb70

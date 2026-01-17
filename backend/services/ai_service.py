@@ -1,67 +1,158 @@
+import os
+import requests
+import json
 import random
-import time
+
+# --- GROQ API INTEGRATION ---
+
+def get_groq_headers():
+    token = os.getenv('GROQ_API_KEY')
+    if not token:
+        return None
+    return {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
+
+def query_groq(messages):
+    """
+    Sends request to Groq OpenAI-compatible endpoint with strict validation.
+    """
+    headers = get_groq_headers()
+    if not headers:
+        return {"error": "Missing GROQ_API_KEY"}
+    
+    url = "https://api.groq.com/openai/v1/chat/completions"
+    
+    # 1. Validate Messages Payload
+    if not messages or not isinstance(messages, list):
+        return {"error": "Internal Error: Messages must be a list"}
+    
+    for msg in messages:
+        if not isinstance(msg, dict) or 'role' not in msg or 'content' not in msg:
+             return {"error": "Internal Error: Invalid message format"}
+    
+    # 2. Construct Payload
+    payload = {
+        "model": "llama-3.1-8b-instant",
+        "messages": messages,
+        "temperature": 0.7,
+        "max_tokens": 1024,
+        "top_p": 1,
+        "stream": False,
+        "stop": None
+    }
+    
+    try:
+        # Debug Log: Log the exact payload being sent
+        try:
+             with open('ai_debug.log', 'a') as f: 
+                 f.write(f"Sending Payload: {json.dumps(payload)}\n")
+        except: pass
+
+        resp = requests.post(url, headers=headers, json=payload, timeout=30)
+        
+        if resp.status_code == 200:
+            result = resp.json()
+            if 'choices' in result and result['choices']:
+                return {"content": result['choices'][0]['message']['content'].strip()}
+            return {"error": "Empty Response from Groq"}
+            
+        # Error Handling
+        error_msg = f"Groq Error {resp.status_code}: {resp.text}"
+        print(error_msg)
+        try:
+            with open('ai_debug.log', 'a') as f: f.write(error_msg + '\n')
+        except: pass
+        
+        if resp.status_code == 400: return {"error": f"Bad Request (400): {resp.text}"}
+        if resp.status_code == 401: return {"error": "Invalid Groq API Key"}
+        if resp.status_code == 429: return {"error": "Rate Limit Exceeded"}
+        
+        return {"error": f"API Error: {resp.status_code}"}
+        
+    except Exception as e:
+        print(f"Groq Connection Exception: {e}")
+        return {"error": f"Connection Error: {str(e)}"}
+
+def clean_json(text):
+    """Extract JSON from markdown code blocks if present."""
+    if "```json" in text:
+        text = text.split("```json")[1].split("```")[0]
+    elif "```" in text:
+        text = text.split("```")[1].split("```")[0]
+    return text.strip()
+
+# --- MAIN EXPORTS ---
 
 def generate_video_ideas(topic, channel_name):
     """
-    Simulates AI brainstorming.
-    Returns a list of creative video titles and concepts.
+    Generates video ideas using Groq Llama 3.
     """
-    # Simulate network delay for realism
-    time.sleep(1.5)
+    prompt = f"""
+    Generate 5 viral YouTube video titles for a channel named '{channel_name}' about the topic '{topic}'.
+    Return ONLY a JSON object with a key 'titles' containing a list of strings.
+    Example: {{"titles": ["Title 1", "Title 2"]}}
+    """
     
-    templates = [
-        "Why {topic} is Broken (And How to Fix It)",
-        "I Tried {topic} for 7 Days - Here's What Happened",
-        "The Ultimate Guide to {topic} for Beginners",
-        "Stop Doing {topic} Like This! (Do This Instead)",
-        "{topic} Explained in 5 Minutes",
-        "The Dark Truth About {topic} nobody tells you",
-        "10 {topic} Hacks That Actually Work",
-        "How {channel_name} Mastered {topic}",
-        "Is {topic} Worth It in 2024?",
-        "My Secret {topic} Strategy Revealed"
+    # Added System Prompt for robustness
+    messages = [
+        {"role": "system", "content": "You are a creative YouTube Strategist. Output JSON only."},
+        {"role": "user", "content": prompt}
     ]
     
-    # Randomly select 5 templates and fill them
-    selected = random.sample(templates, 5)
-    ideas = []
+    res = query_groq(messages)
     
-    for i, tmpl in enumerate(selected):
-        title = tmpl.format(topic=topic, channel_name=channel_name)
-        ideas.append({
-            'id': i + 1,
-            'title': title,
-            'confidence': random.randint(85, 99)
-        })
-        
-    return ideas
+    if 'error' in res:
+        return [{'id': 0, 'title': f"FAILED: {res['error']}", 'confidence': 0}]
+    
+    content = res['content']
+    try:
+        data = json.loads(clean_json(content))
+        titles = data.get('titles', [])
+        return [{'id': i+1, 'title': t, 'confidence': random.randint(85, 99)} for i, t in enumerate(titles)]
+    except Exception as e:
+        print(f"JSON Parse Error: {e}")
+        return [{'id': 0, 'title': "Error: Failed to parse AI JSON", 'confidence': 0}]
 
 def generate_script(title, tone):
     """
-    Simulates AI Script Writing.
-    Returns a structured script based on the title and tone.
+    Generates script using Groq Llama 3.
     """
-    time.sleep(2.0)
+    prompt = f"Write a structured YouTube video script for '{title}' with a {tone} tone. Use Markdown headings (##, ###)."
     
-    return f"""
-# Video Script: {title}
-**Tone:** {tone.capitalize()}
+    messages = [
+        {"role": "system", "content": "You are a professional YouTube Scriptwriter."},
+        {"role": "user", "content": prompt}
+    ]
+    
+    res = query_groq(messages)
+    
+    if 'error' in res:
+        return f"**AI Generation Failed:** {res['error']}"
+        
+    return res['content']
 
-## [0:00-0:30] The Hook
-(Face Camera, High Energy)
-"Have you ever wondered why {title.split(' ')[0]} seems so complicated? Well, today we're breaking it down once and for all."
-
-## [0:30-1:30] The Problem
-"Most people get stuck when they try to start. They think..."
-(Cut to B-Roll of common mistakes)
-"But here is the truth..."
-
-## [1:30-5:00] The Solution ({tone} Style)
-1. **Step One:** The Foundation.
-2. **Step Two:** The Execution.
-   (Show screen recording or demonstration)
-3. **Step Three:** The Secret Sauce.
-
-## [5:00-6:00] Conclusion & CTA
-"Now that you know the secret, go try it out! Don't forget to like and subscribe for more content."
-"""
+def generate_channel_names(keywords):
+    """
+    Generates creative channel names using Groq Llama 3.
+    """
+    prompt = f"""
+    Generate 10 creative, catchy, and available-sounding YouTube channel names based on keywords: '{keywords}'.
+    Return ONLY a JSON object with a key 'names' containing a list of strings.
+    Example: {{"names": ["Name 1", "Name 2"]}}
+    """
+    
+    messages = [
+        {"role": "system", "content": "You are a creative brand naming expert. Output JSON only."},
+        {"role": "user", "content": prompt}
+    ]
+    
+    res = query_groq(messages)
+    if 'error' in res:
+         return [{'title': f"Error: {res['error']}"}]
+         
+    try:
+        data = json.loads(clean_json(res['content']))
+        names = data.get('names', [])
+        # Return in same format as ideas for frontend compatibility (title property)
+        return [{'id': i+1, 'title': n, 'confidence': random.randint(90, 99)} for i, n in enumerate(names)]
+    except:
+        return [{'title': "Error parsing names"}]

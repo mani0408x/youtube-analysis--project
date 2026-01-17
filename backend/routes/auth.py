@@ -5,23 +5,6 @@ from backend.models import User, db
 from functools import wraps
 import jwt
 import datetime
-<<<<<<< HEAD
-
-auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
-
-# verify google token from frontend
-def verify_google_token(token):
-    try:
-        client_id = current_app.config.get('GOOGLE_CLIENT_ID')
-        if not client_id: return None
-        id_info = id_token.verify_oauth2_token(token, google_requests.Request(), client_id, clock_skew_in_seconds=30)
-        return id_info
-    except Exception as e:
-        print(f"Auth Error: {e}")
-        return None
-
-# create a simple jwt for the session
-=======
 from werkzeug.security import generate_password_hash, check_password_hash
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
@@ -33,11 +16,24 @@ def verify_google_token(token):
     try:
         client_id = current_app.config.get('GOOGLE_CLIENT_ID')
         if not client_id:
-            return None
-        id_info = id_token.verify_oauth2_token(token, google_requests.Request(), client_id)
-        return id_info
+            return None, "Missing Server Configuration (Client ID)"
+        id_info = id_token.verify_oauth2_token(token, google_requests.Request(), client_id, clock_skew_in_seconds=10)
+        return id_info, None
     except Exception as e:
-        # print(f"Google Token Verification Error: {e}")
+        print(f"Google Token Verification Error: {e}")
+        return None, str(e)
+
+def create_custom_token(user_id):
+    try:
+        payload = {
+            'sub': user_id,
+            'iat': datetime.datetime.utcnow(),
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=7),
+            'type': 'custom'
+        }
+        return jwt.encode(payload, current_app.config['SECRET_KEY'], algorithm='HS256')
+    except Exception as e:
+        print(f"Token creation error: {e}")
         return None
 
 def verify_custom_token(token):
@@ -48,64 +44,17 @@ def verify_custom_token(token):
         # print(f"Custom Token Verification Error: {e}")
         return None
 
->>>>>>> 82fa5d1b9167d5712274c819447d13bfca8fbb70
-def create_custom_token(user_id):
-    try:
-        payload = {
-            'sub': user_id,
-            'iat': datetime.datetime.utcnow(),
-<<<<<<< HEAD
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=7)
-        }
-        return jwt.encode(payload, current_app.config['SECRET_KEY'], algorithm='HS256')
-    except Exception as e:
-        return None
-
-def verify_custom_token(token):
-    try:
-        return jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=['HS256'])
-    except:
-        return None
-
-# login decorator
-=======
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=7),
-            'type': 'custom'
-        }
-        return jwt.encode(payload, current_app.config['SECRET_KEY'], algorithm='HS256')
-    except Exception as e:
-        print(f"Token creation error: {e}")
-        return None
-
->>>>>>> 82fa5d1b9167d5712274c819447d13bfca8fbb70
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         auth_header = request.headers.get('Authorization')
-<<<<<<< HEAD
-        if not auth_header:
-            return jsonify({'error': 'Unauthorized'}), 401
-        
-        token = auth_header.split(' ')[1]
-        user = None
-        
-        decoded = verify_custom_token(token)
-        if decoded:
-            user = User.query.get(decoded['sub'])
-            
-        if user:
-            g.user = user
-            return f(*args, **kwargs)
-            
-        return jsonify({'error': 'Unauthorized'}), 401
-=======
         if not auth_header or not auth_header.startswith('Bearer '):
             return jsonify({'error': 'Unauthorized', 'message': 'Missing Token'}), 401
         
         token = auth_header.split(' ')[1]
         
         # 1. Try Google Token
-        google_decoded = verify_google_token(token)
+        google_decoded, _ = verify_google_token(token)
         if google_decoded:
             uid = google_decoded['sub']
             user = User.query.filter_by(firebase_uid=uid).first()
@@ -124,19 +73,8 @@ def login_required(f):
             
         return jsonify({'error': 'Unauthorized', 'message': 'Invalid Token'}), 401
         
->>>>>>> 82fa5d1b9167d5712274c819447d13bfca8fbb70
     return decorated_function
 
-# --- Routes ---
-
-<<<<<<< HEAD
-# Unified Login/Verify (Google)
-@auth_bp.route('/verify', methods=['POST'])
-def verify_google_user():
-    data = request.json
-    token = data.get('token')
-    if not token: return jsonify({'error': 'Token required'}), 400
-=======
 @auth_bp.route('/signup', methods=['POST'])
 def signup():
     data = request.json
@@ -217,28 +155,12 @@ def verify_google_user():
     token = data.get('token')
     if not token:
         return jsonify({'error': 'Token required'}), 400
->>>>>>> 82fa5d1b9167d5712274c819447d13bfca8fbb70
 
-    decoded = verify_google_token(token)
+    decoded, error_msg = verify_google_token(token)
     if not decoded:
-        return jsonify({'error': 'Invalid Token'}), 401
+        print(f"Auth Verification Failed: {error_msg}")
+        return jsonify({'error': f'Invalid Token: {error_msg}'}), 401
 
-<<<<<<< HEAD
-    email = decoded.get('email')
-    if not email: return jsonify({'error': 'No email in token'}), 400
-
-    # Upsert User (Email Only)
-    user = User.query.filter_by(email=email).first()
-    if not user:
-        user = User(email=email)
-        db.session.add(user)
-        try:
-            db.session.commit()
-        except:
-            db.session.rollback()
-            return jsonify({'error': 'DB Error'}), 500
-
-=======
     # Standard Google Claims
     uid = decoded['sub']
     email = decoded.get('email')
@@ -287,63 +209,16 @@ def verify_google_user():
         db.session.rollback()
         return jsonify({'error': 'Database Error', 'details': str(e)}), 500
 
-    # Return success. 
-    # We can perform Token Exchange here: Return a Custom JWT to unify session management?
-    # Or just return success and let frontend use the Google Token.
-    # The 'login_required' supports Google Token, so we can just return success.
-    # BUT, to be safer and support 'auth_type' consistency, let's returning a custom token is nicer.
-    # However, keeping it minimal: Frontend sends 'token' (Google credential) to 'verify'. 
-    # If we return a NEW token, frontend must switch to using that.
-    # Let's return a 'token' field. If frontend wants to use it, good.
-    
-    # Let's return the Custom JWT as 'token' so frontend can use it (and it lasts 7 days vs Google's 1 hour).
->>>>>>> 82fa5d1b9167d5712274c819447d13bfca8fbb70
     new_token = create_custom_token(user.id)
     
     return jsonify({
         'status': 'success',
-<<<<<<< HEAD
-        'token': new_token,
-        'user': {
-            'id': user.id,
-            'email': user.email,
-            'name': decoded.get('name', email.split('@')[0]),
-            'assigned_channel_id': user.assigned_channel.channel_id if user.assigned_channel else None
-        }
-    })
-
-# Direct Email Login (Testing/Simple)
-@auth_bp.route('/login', methods=['POST'])
-def login():
-    data = request.json
-    email = data.get('email')
-    
-    if not email: return jsonify({'error': 'Email required'}), 400
-
-    user = User.query.filter_by(email=email).first()
-    if not user:
-        user = User(email=email)
-        db.session.add(user)
-        db.session.commit()
-
-    token = create_custom_token(user.id)
-    
-    return jsonify({
-        'status': 'success',
-        'token': token,
-        'user': {
-            'id': user.id,
-            'email': user.email,
-            'name': email.split('@')[0],
-            'assigned_channel_id': user.assigned_channel.channel_id if user.assigned_channel else None
-=======
         'token': new_token, # Send our long-lived token
         'user': {
             'id': user.id,
             'name': user.name,
             'email': user.email,
             'photo': user.photo_url
->>>>>>> 82fa5d1b9167d5712274c819447d13bfca8fbb70
         }
     })
 
@@ -355,15 +230,9 @@ def get_me():
             'authenticated': True,
             'user': {
                 'id': g.user.id,
-<<<<<<< HEAD
-                'email': g.user.email,
-                'name': g.user.email.split('@')[0],
-                'assigned_channel_id': g.user.assigned_channel.channel_id if g.user.assigned_channel else None
-=======
                 'name': g.user.name,
                 'email': g.user.email,
                 'photo': g.user.photo_url
->>>>>>> 82fa5d1b9167d5712274c819447d13bfca8fbb70
             }
         })
     return jsonify({'authenticated': False}), 401

@@ -1,393 +1,7 @@
 from flask import Blueprint, jsonify, request, current_app
-<<<<<<< HEAD
-from backend.models import User, Channels, UserChannels, db
-from backend.services.youtube_service import get_channel_details, search_channels, get_channel_videos
-from datetime import datetime, timedelta
-import json
-import random
-
-api_bp = Blueprint('api', __name__, url_prefix='/api')
-
-# --- Helper: KPI Calculation & Strategy ---
-def calculate_kpis(details, videos):
-    # Basic data
-    subs = details.get('subscriber_count', 0)
-    total_views = details.get('view_count', 0)
-    
-    engagement_rate = 0.0
-    total_engagement_actions = 0
-    recent_views = 0
-    
-    # Store views by day for best day analysis
-    day_views = {d: [] for d in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']}
-    
-    if videos:
-        for v in videos:
-            v_views = v.get('view_count', 0)
-            actions = v.get('like_count', 0) + v.get('comment_count', 0)
-            
-            if v_views > 0:
-                total_engagement_actions += actions
-                recent_views += v_views
-            
-            # Simple day of week tracker
-            try:
-                dt = datetime.fromisoformat(v['published_at'].replace('Z', '+00:00'))
-                day_name = dt.strftime('%A')
-                day_views[day_name].append(v_views)
-            except:
-                pass
-        
-        if recent_views > 0:
-            engagement_rate = (total_engagement_actions / recent_views) * 100
-            
-    # Calculate best day to upload
-    best_day = "Unknown"
-    max_avg = -1
-    for day, views in day_views.items():
-        if views:
-            avg = sum(views) / len(views)
-            if avg > max_avg:
-                max_avg = avg
-                best_day = day
- 
-    # Simulated earnings based on views
-    earnings = (total_views / 1000) * 2.0
-
-    # Mock growth data for the chart
-    growth = []
-    for i in range(30):
-        day = datetime.utcnow() - timedelta(days=30-i)
-        growth.append({
-            'date': day.strftime('%Y-%m-%d'),
-            'subscribers': int(subs * (0.9 + (0.1 * (i/30))))
-        })
-    
-    return {
-        'engagement_rate': round(engagement_rate, 2),
-        'estimated_earnings': int(earnings),
-        'growth': growth,
-        'strategy': {
-            'best_upload_day': best_day,
-            'best_upload_time': "18:00",
-            'sample_size': len(videos)
-        },
-        'trends': [] # Simplified
-    }
-
-# --- 1. Login ---
-@api_bp.route('/login', methods=['POST'])
-def login():
-    data = request.json
-    email = data.get('email')
-    if not email: return jsonify({'error': 'Email is required'}), 400
-    try:
-        user = User.query.filter_by(email=email).first()
-        if not user:
-            user = User(email=email); db.session.add(user); db.session.commit()
-        return jsonify({'success': True, 'email': email, 'user_id': user.id})
-    except Exception as e:
-        db.session.rollback(); return jsonify({'error': str(e)}), 500
-
-# --- 2. Analyze Channel (Real Strategy + Pagination) ---
-@api_bp.route('/analyze-channel', methods=['POST'])
-def analyze_channel():
-    data = request.json
-    email = data.get('email')
-    channel_id = data.get('channel_id')
-    
-    # Optional pagination
-    page_token = data.get('page_token')
-    max_videos = 200 # Fetch 200 to get approx 12 months data
-
-    if not email or not channel_id:
-        return jsonify({'error': 'Email and Channel ID are required'}), 400
-
-    try:
-        # A. Get User
-        user = User.query.filter_by(email=email).first()
-        if not user:
-            user = User(email=email); db.session.add(user); db.session.commit()
-
-        # B. Get Channel Details
-        details = get_channel_details(channel_id)
-        if not details:
-            return jsonify({'error': 'Invalid Channel ID'}), 404
-
-        # B2. Get Channel Videos (With Pagination Support)
-        uploads_id = details.get('uploads_playlist')
-        videos_data = {'videos': [], 'next_page_token': None}
-        
-        if uploads_id:
-             # If loading more, we might just want videos?
-             # But 'analyze' is the main dashboard load.
-             # Let's fetch 50.
-             videos_data = get_channel_videos(uploads_id, max_results=max_videos, page_token=page_token)
-
-        videos = videos_data.get('videos', [])
-        next_token = videos_data.get('next_page_token')
-
-        # B3. Calculate KPIs (Use all fetched videos for analysis)
-        kpis = calculate_kpis(details, videos)
-
-        # C. Upsert Channel
-        channel_entry = Channels.query.filter_by(channel_id=channel_id).first()
-        if not channel_entry:
-            channel_entry = Channels(channel_id=channel_id, channel_name=details.get('title'))
-            channel_entry.set_details(details)
-            db.session.add(channel_entry)
-        else:
-            channel_entry.channel_name = details.get('title')
-            channel_entry.set_details(details)
-        db.session.commit()
-
-        # D. Link User (Prevent Duplicates)
-        existing_link = UserChannels.query.filter_by(user_id=user.id, channel_id=channel_entry.id).first()
-        if existing_link:
-            existing_link.analyzed_at = datetime.utcnow()
-        else:
-            new_link = UserChannels(user_id=user.id, channel_id=channel_entry.id, analyzed_at=datetime.utcnow())
-            db.session.add(new_link)
-        
-        db.session.commit()
-
-        # E. Response
-        response = {
-            'success': True,
-            'channel': details,
-            'kpis': {
-                'engagement_rate': kpis['engagement_rate'],
-                'estimated_earnings': kpis['estimated_earnings']
-            },
-            'videos': videos, # Front end can slice top 5, or show all
-            'next_page_token': next_token,
-            'growth': kpis['growth'],
-            'strategy': kpis['strategy']
-        }
-        return jsonify(response)
-
-    except Exception as e:
-        db.session.rollback(); return jsonify({'error': str(e)}), 500
-
-# --- 2b. Fetch More Videos (Dedicated Endpoint) ---
-@api_bp.route('/channel/videos', methods=['POST'])
-def get_more_videos():
-    data = request.json
-    channel_id = data.get('channel_id')
-    page_token = data.get('page_token') # Required for next page
-    
-    if not channel_id: return jsonify({'error': 'Channel ID required'}), 400
-    
-    try:
-        details = get_channel_details(channel_id)
-        if not details: return jsonify({'error': 'Invalid ID'}), 404
-        
-        uploads_id = details.get('uploads_playlist')
-        if not uploads_id: return jsonify({'videos': [], 'next_page_token': None})
-        
-        # Fetch next batch (e.g. 20)
-        videos_data = get_channel_videos(uploads_id, max_results=20, page_token=page_token)
-        return jsonify(videos_data) # {videos, next_page_token}
-        
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-# --- 3. Compare ---
-@api_bp.route('/compare', methods=['POST'])
-def compare_channels():
-    data = request.json
-    channel_ids = data.get('channel_ids', [])
-    if not channel_ids: return jsonify({'error': 'IDs required'}), 400
-
-    results = []
-    try:
-        for cid in channel_ids:
-            details = get_channel_details(cid)
-            if details:
-                uploads = details.get('uploads_playlist')
-                # get_channel_videos returns dict now
-                v_data = get_channel_videos(uploads, max_results=20) if uploads else {'videos': []}
-                videos = v_data.get('videos', [])
-                
-                kpis = calculate_kpis(details, videos)
-                results.append({
-                    'channel': details,
-                    'kpis': kpis,
-                    'videos': videos[:5], # Limit for compare
-                    'growth': kpis['growth']
-                })
-        return jsonify({'results': results})
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-# --- 4. Compare Top ---
-@api_bp.route('/compare/top', methods=['GET'])
-def compare_top():
-    try:
-        all_channels = Channels.query.all()
-        def get_subs(c): return c.get_details().get('subscriber_count', 0)
-        all_channels.sort(key=get_subs, reverse=True)
-        top_5 = all_channels[:5]
-        
-        results = []
-        for ch in top_5:
-             details = ch.get_details()
-             kpis = calculate_kpis(details, []) 
-             results.append({
-                 'channel': details,
-                 'kpis': kpis, 
-                 'videos': [], 
-                 'growth': kpis['growth']
-             })
-        return jsonify({'results': results})
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-# --- 5. My Channels ---
-@api_bp.route('/my-channels', methods=['GET'])
-def my_channels():
-    email = request.args.get('email')
-    if not email: return jsonify({'error': 'Email required'}), 400
-    try:
-        user = User.query.filter_by(email=email).first()
-        if not user: return jsonify([])
-        recent = db.session.query(UserChannels, Channels).join(Channels, UserChannels.channel_id == Channels.id).filter(UserChannels.user_id == user.id).order_by(UserChannels.analyzed_at.desc()).all()
-        
-        results = []
-        seen = set()
-        for uc, ch in recent:
-            if ch.channel_id not in seen:
-                results.append({
-                    'channel_id': ch.channel_id,
-                    'channel_name': ch.channel_name,
-                    'details': ch.get_details(),
-                    'last_analyzed': uc.analyzed_at.isoformat()
-                })
-                seen.add(ch.channel_id)
-        return jsonify(results)
-    except Exception as e: return jsonify({'error': str(e)}), 500
-
-# --- 6. Suggestions ---
-@api_bp.route('/suggestions', methods=['GET'])
-def get_suggestions():
-    q = request.args.get('q')
-    if not q: return jsonify([])
-    try:
-        results = search_channels(q, limit=5)
-        return jsonify(results)
-    except Exception as e: return jsonify([])
-
-# --- 7. Config ---
-@api_bp.route('/config/public', methods=['GET'])
-def get_public_config():
-    return jsonify({'google_client_id': current_app.config.get('GOOGLE_CLIENT_ID')})
-
-# --- 8. AI routes removed (handled by huggingface_service blueprint) ---
-
-# --- 9. Reports ---
-@api_bp.route('/reports/monthly/<channel_id>', methods=['GET'])
-def monthly_report(channel_id):
-    try:
-        # We need to fetch videos to generate this report
-        details = get_channel_details(channel_id)
-        if not details: return jsonify({'error': 'Channel not found'}), 404
-        
-        uploads = details.get('uploads_playlist')
-        # Fetch more videos for a better report, e.g. 100
-        # This might be slow content-wise, but okay for a dedicated report request
-        videos_data = get_channel_videos(uploads, max_results=200) # Increased for deeper history
-        videos = videos_data.get('videos', [])
-        
-        # Aggregate by Month
-        monthly_stats = {}
-        
-        for v in videos:
-            try:
-                dt = datetime.fromisoformat(v['published_at'].replace('Z', '+00:00'))
-                key = dt.strftime('%Y-%m') # 2024-01
-                if key not in monthly_stats:
-                    monthly_stats[key] = {'month': key, 'total_views': 0, 'video_count': 0, 'likes': 0}
-                
-                monthly_stats[key]['total_views'] += v.get('view_count', 0)
-                monthly_stats[key]['likes'] += v.get('like_count', 0)
-                monthly_stats[key]['video_count'] += 1
-            except: pass
-            
-        # Convert to list and sort
-        report = list(monthly_stats.values())
-        report.sort(key=lambda x: x['month'], reverse=True)
-        
-        # Enriched response with mock subscriber growth if not tracking (MVP limitation)
-        # We can't know historical subs without tracking. We'll return 0 or current for latest.
-        current_subs = details.get('subscriber_count', 0)
-        if report:
-            report[0]['total_subscribers'] = current_subs
-            # mock previous
-            for i in range(1, len(report)):
-                 report[i]['total_subscribers'] = int(report[i-1]['total_subscribers'] * 0.95)
-
-        return jsonify({'report': report})
-    except Exception as e: return jsonify({'error': str(e)}), 500
-
-# --- 10. Landing Page Preview ---
-@api_bp.route('/preview', methods=['POST'])
-def preview_channel():
-    data = request.json
-    channel_input = data.get('channel_input')
-    if not channel_input:
-        return jsonify({'error': 'Channel input required'}), 400
-
-    try:
-        # 1. Get Details (Resolves URL/Name)
-        details = get_channel_details(channel_input)
-        if not details:
-            return jsonify({'error': 'Channel not found'}), 404
-
-        # 2. Get Recent Videos (Limit 50 for speed)
-        uploads = details.get('uploads_playlist')
-        videos_data = get_channel_videos(uploads, max_results=50) if uploads else {'videos': []}
-        videos = videos_data.get('videos', [])
-
-        # 3. Calculate metrics
-        total_likes = sum(v.get('like_count', 0) for v in videos)
-        total_comments = sum(v.get('comment_count', 0) for v in videos)
-        recent_views = sum(v.get('view_count', 0) for v in videos)
-        
-        engagement_rate = 0
-        if recent_views > 0:
-            engagement_rate = ((total_likes + total_comments) / recent_views) * 100
-
-        # Earnings (Lifetime)
-        lifetime_views = details.get('view_count', 0)
-        estimated_earnings = (lifetime_views / 1000) * 2.0 # $2 RPM
-
-        # 4. Construct Response
-        response = {
-            'channel': {
-                'title': details['title'],
-                'thumbnail_url': details['thumbnail_url'],
-                'subscriber_count': details['subscriber_count'],
-                'video_count': details['video_count'],
-                'view_count': details['view_count'], # Lifetime
-                'last_updated': datetime.utcnow().isoformat(),
-                'description': details['description']
-            },
-            'metrics': {
-                'total_likes': total_likes,
-                'total_comments': total_comments,
-                'engagement_rate': round(engagement_rate, 2),
-                'estimated_earnings': int(estimated_earnings)
-            }
-        }
-        return jsonify(response)
-
-    except Exception as e:
-        print(f"Preview Error: {e}")
-        return jsonify({'error': str(e)}), 500
-=======
-from backend.services.youtube_service import get_channel_details, get_channel_videos
+from backend.services.youtube_service import get_channel_details, get_channel_videos, resolve_channel_input, search_channels
 from backend.services.analytics_service import calculate_earnings, segment_videos, get_historical_data, determine_best_upload_time
-from backend.models import Channel, Video, DailyChannelStats, db
+from backend.models import Channel, Video, DailyChannelStats, User, UserChannels, db
 from datetime import datetime, date, timedelta
 from sqlalchemy import desc
 import pandas as pd
@@ -445,7 +59,7 @@ def process_channel_analysis(channel_id):
         db.session.commit()
         
         # 3. Fetch Videos
-        videos_data = get_channel_videos(channel_data['uploads_playlist'])
+        videos_data, _ = get_channel_videos(channel_data['uploads_playlist'])
         
         processed_videos = []
         for v_data in videos_data:
@@ -531,12 +145,12 @@ def process_channel_analysis(channel_id):
 def analyze_channel():
     data = request.json
     channel_input = data.get('channel_id') # Can be ID or Name
+    email = data.get('email') # Restored from HEAD for history
     
     if not channel_input:
         return jsonify({'error': 'Channel Name or ID is required'}), 400
 
     print(f"DEBUG: Received analyze request for: {channel_input}")
-    from backend.services.youtube_service import resolve_channel_input
     resolved = resolve_channel_input(channel_input)
     print(f"DEBUG: Resolved to: {resolved}")
     
@@ -551,9 +165,6 @@ def analyze_channel():
             channel_id = resolved[0]['id']
         else:
              return jsonify({'error': 'Channel not found'}), 404
-             
-        # Log or handled differently if we wanted logic for multiple options, 
-        # but user requested automatic fetch for name.
     else:
         channel_id = resolved
 
@@ -562,6 +173,27 @@ def analyze_channel():
         return jsonify({'error': 'Channel not found'}), 404
     if 'error' in result:
         return jsonify(result), 500
+    
+    # 5. Link User (Restored from HEAD)
+    if email:
+        try:
+            user = User.query.filter_by(email=email).first()
+            if not user:
+                 user = User(email=email)
+                 db.session.add(user)
+                 db.session.commit()
+            
+            # Link
+            existing_link = UserChannels.query.filter_by(user_id=user.id, channel_id=channel_id).first()
+            if existing_link:
+                existing_link.analyzed_at = datetime.utcnow()
+            else:
+                new_link = UserChannels(user_id=user.id, channel_id=channel_id, analyzed_at=datetime.utcnow())
+                db.session.add(new_link)
+            db.session.commit()
+        except Exception as e:
+            print(f"Warning: Failed to link user history: {e}")
+            # Don't fail the analysis if history linking fails
     
     return jsonify(result)
 
@@ -580,8 +212,6 @@ def compare_channels():
     if not inputs or not isinstance(inputs, list) or len(inputs) < 2:
         return jsonify({'error': 'At least two Channel names/IDs are required'}), 400
         
-    from backend.services.youtube_service import resolve_channel_input
-    
     resolved_ids = []
     
     for idx, inp in enumerate(inputs):
@@ -634,6 +264,35 @@ def compare_top_channels():
             }
         })
     return jsonify({'results': results})
+
+# --- My Channels (Restored) ---
+@api_bp.route('/my-channels', methods=['GET'])
+def my_channels():
+    email = request.args.get('email')
+    if not email: return jsonify({'error': 'Email required'}), 400
+    try:
+        user = User.query.filter_by(email=email).first()
+        if not user: return jsonify([])
+        
+        recent = db.session.query(UserChannels, Channel).join(Channel, UserChannels.channel_id == Channel.id).filter(UserChannels.user_id == user.id).order_by(UserChannels.analyzed_at.desc()).all()
+        
+        results = []
+        seen = set()
+        for uc, ch in recent:
+            if ch.id not in seen:
+                results.append({
+                    'channel_id': ch.id,
+                    'channel_name': ch.title,
+                    'details': {
+                         'title': ch.title,
+                         'thumbnail_url': ch.thumbnail_url,
+                         'subscriber_count': ch.subscriber_count
+                    },
+                    'last_analyzed': uc.analyzed_at.isoformat()
+                })
+                seen.add(ch.id)
+        return jsonify(results)
+    except Exception as e: return jsonify({'error': str(e)}), 500
 
 @api_bp.route('/reports/monthly/<channel_id>', methods=['GET'])
 def monthly_report(channel_id):
@@ -702,6 +361,13 @@ def generate_ai_content():
             result = generate_script(title, tone)
             return jsonify({'result': result})
             
+        elif action == 'names':
+            # Needs 'topic' (which is passed as keywords from frontend input)
+            from backend.services.ai_service import generate_channel_names
+            topic = data.get('topic', 'Creative')
+            result = generate_channel_names(topic)
+            return jsonify({'result': result})
+
         else:
             return jsonify({'error': 'Invalid action'}), 400
             
@@ -743,7 +409,6 @@ def get_suggestions():
             'subscriber_count': 999999
         }])
 
-    from backend.services.youtube_service import search_channels
     
     # DEBUG: Log to file
     try:
@@ -766,5 +431,91 @@ def get_suggestions():
         pass
 
     return jsonify(results)
->>>>>>> 82fa5d1b9167d5712274c819447d13bfca8fbb70
 
+@api_bp.route('/channel/videos', methods=['POST'])
+def get_more_videos():
+    data = request.json
+    channel_id = data.get('channel_id')
+    page_token = data.get('page_token')
+    
+    if not channel_id:
+        return jsonify({'error': 'Channel ID required'}), 400
+        
+    try:
+        # 1. Get Playlist ID (Need to fetch details if not stored/passed, simpler to fetch)
+        channel_data = get_channel_details(channel_id)
+        if not channel_data:
+             return jsonify({'error': 'Channel not found'}), 404
+             
+        uploads_id = channel_data['uploads_playlist']
+
+        # 2. Fetch more videos
+        videos_data, next_token = get_channel_videos(uploads_id, max_results=10, page_token=page_token)
+        
+        return jsonify({'videos': videos_data, 'next_page_token': next_token})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# --- Preview (Restored) ---
+@api_bp.route('/preview', methods=['POST'])
+def preview_channel():
+    data = request.json
+    channel_input = data.get('channel_input')
+    if not channel_input:
+        return jsonify({'error': 'Channel input required'}), 400
+
+    try:
+        # 1. Get Details
+        resolved = resolve_channel_input(channel_input)
+        if not resolved: return jsonify({'error': 'Channel not found'}), 404
+        
+        if isinstance(resolved, list):
+             channel_id = resolved[0]['id']
+        else:
+             channel_id = resolved
+
+        details = get_channel_details(channel_id)
+        if not details: return jsonify({'error': 'Channel not found'}), 404
+
+        # 2. Get Recent Videos
+        uploads_id = details.get('uploads_playlist')
+        videos = []
+        if uploads_id:
+             videos, _ = get_channel_videos(uploads_id, max_results=50)
+
+        # 3. Calculate metrics
+        total_likes = sum(v.get('like_count', 0) for v in videos)
+        total_comments = sum(v.get('comment_count', 0) for v in videos)
+        recent_views = sum(v.get('view_count', 0) for v in videos)
+        
+        engagement_rate = 0
+        if recent_views > 0:
+            engagement_rate = ((total_likes + total_comments) / recent_views) * 100
+
+        # Earnings (Lifetime)
+        lifetime_views = details.get('view_count', 0)
+        estimated_earnings = (lifetime_views / 1000) * 2.0 
+
+        # 4. Construct Response
+        response = {
+            'channel': {
+                'title': details['title'],
+                'thumbnail_url': details['thumbnail_url'],
+                'subscriber_count': details['subscriber_count'],
+                'video_count': details['video_count'],
+                'view_count': details['view_count'],
+                'last_updated': datetime.utcnow().isoformat(),
+                'description': details['description']
+            },
+            'metrics': {
+                'total_likes': total_likes,
+                'total_comments': total_comments,
+                'engagement_rate': round(engagement_rate, 2),
+                'estimated_earnings': int(estimated_earnings)
+            }
+        }
+        return jsonify(response)
+
+    except Exception as e:
+        print(f"Preview Error: {e}")
+        return jsonify({'error': str(e)}), 500

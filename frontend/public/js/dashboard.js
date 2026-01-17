@@ -1,20 +1,8 @@
-<<<<<<< HEAD
-// get the auth token from storage
-=======
 // Helper to get current token for API calls
->>>>>>> 82fa5d1b9167d5712274c819447d13bfca8fbb70
 async function getAuthToken() {
     return localStorage.getItem('auth_token');
 }
 
-<<<<<<< HEAD
-document.addEventListener('DOMContentLoaded', () => {
-
-    const token = localStorage.getItem('auth_token');
-    const userInfo = localStorage.getItem('user_info');
-
-    // redirect if not logged in
-=======
 window.addEventListener('error', function (e) {
     console.error(e);
     // Provide visual feedback if JS crashes
@@ -36,23 +24,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const token = localStorage.getItem('auth_token');
     const userInfo = localStorage.getItem('user_info');
 
->>>>>>> 82fa5d1b9167d5712274c819447d13bfca8fbb70
     if (!token) {
         window.location.href = '/login';
         return;
     }
 
-<<<<<<< HEAD
-    const userProfileArea = document.getElementById('user-profile-area');
-
-    // show user profile in sidebar
-    const renderUser = (user) => {
-        if (!userProfileArea) return;
-        const avatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=random`;
-
-        userProfileArea.innerHTML = `
-            <div id="profile-trigger" style="display:flex; align-items:center; gap:12px; cursor:pointer;">
-=======
     // Fix: Target the correct ID from dashboard.html (user-profile-area)
     const userProfileArea = document.getElementById('user-profile-area');
 
@@ -64,23 +40,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Inject HTML with Menu
         userProfileArea.innerHTML = `
-            <div id="profile-trigger" style="display:flex; align-items:center; gap:12px; width:100%;">
->>>>>>> 82fa5d1b9167d5712274c819447d13bfca8fbb70
-                <img src="${avatar}" class="user-avatar" alt="User">
+            <div id="profile-trigger" style="display:flex; align-items:center; gap:12px; width:100%; cursor:pointer;">
+                <img src="${avatar}" class="user-avatar" alt="User" style="width:32px; height:32px; border-radius:50%;">
                 <div class="user-info-text">
                      <div class="user-name">${user.name}</div>
                      <div class="user-role">Creator</div>
                 </div>
-<<<<<<< HEAD
-            </div>
-            <div class="profile-menu" id="profile-menu-popover">
-                <button class="profile-menu-item" id="sidebar-logout-btn">Logout</button>
-            </div>
-        `;
-
-        const trigger = document.getElementById('profile-trigger');
-        const menu = document.getElementById('profile-menu-popover');
-=======
                 <i class="fas fa-chevron-up" style="margin-left:auto; font-size:0.8rem; color:var(--text-muted);"></i>
             </div>
             
@@ -96,23 +61,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const trigger = userProfileArea.querySelector('#profile-trigger');
         const menu = userProfileArea.querySelector('#profile-menu-popover');
         const logout = userProfileArea.querySelector('#sidebar-logout-btn');
->>>>>>> 82fa5d1b9167d5712274c819447d13bfca8fbb70
 
         trigger.addEventListener('click', (e) => {
             e.stopPropagation();
             menu.classList.toggle('active');
         });
 
-<<<<<<< HEAD
-        document.addEventListener('click', () => menu.classList.remove('active'));
-        document.getElementById('sidebar-logout-btn').addEventListener('click', window.handleSignOut);
-    };
-
-    if (userInfo) {
-        const user = JSON.parse(userInfo);
-        renderUser(user);
-        checkAutoAnalyze(user);
-=======
         // Close on click outside
         document.addEventListener('click', () => {
             menu.classList.remove('active');
@@ -128,31 +82,30 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const user = JSON.parse(userInfo);
             renderUser(user);
+            checkAutoAnalyze(user);
         } catch (e) {
             console.error("Error parsing user info", e);
         }
->>>>>>> 82fa5d1b9167d5712274c819447d13bfca8fbb70
     } else {
         fetchUser();
     }
 
-<<<<<<< HEAD
-    // auto analyze if mapped in db
     async function checkAutoAnalyze(user) {
+        // Simple heuristic: if url has hash, maybe go there
+        // Or if we need to auto-analyze assigned channel
         if (user.assigned_channel_id && !sessionStorage.getItem('auto_analyzed')) {
             sessionStorage.setItem('auto_analyzed', 'true');
             setTimeout(() => {
                 const input = document.getElementById('channel-id-1');
                 if (input) {
                     input.value = user.assigned_channel_id;
-                    document.getElementById('analyze-btn').click();
+                    const analyzeBtn = document.getElementById('analyze-btn');
+                    if (analyzeBtn) analyzeBtn.click();
                 }
             }, 500);
         }
     }
 
-=======
->>>>>>> 82fa5d1b9167d5712274c819447d13bfca8fbb70
     async function fetchUser() {
         try {
             const res = await fetch('/auth/me', {
@@ -162,42 +115,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await res.json();
                 localStorage.setItem('user_info', JSON.stringify(data.user));
                 renderUser(data.user);
-<<<<<<< HEAD
                 checkAutoAnalyze(data.user);
-=======
->>>>>>> 82fa5d1b9167d5712274c819447d13bfca8fbb70
             } else {
                 window.handleSignOut();
             }
         } catch (e) {
-<<<<<<< HEAD
-            console.log("auth check failed");
-        }
-    }
-
-    // switch between tabs
-    const navItems = document.querySelectorAll('.nav-item');
-    const sectionMap = {
-        'Overview': 'section-overview',
-        'Analytics': 'section-analytics',
-        'Videos': 'section-videos',
-        'Analyzed Channels': 'section-my-channels',
-        'AI Studio': 'section-ai-studio'
-    };
-
-    function showSection(name) {
-        const sectionId = sectionMap[name];
-        document.querySelectorAll('.dashboard-section').forEach(s => s.style.display = 'none');
-        const target = document.getElementById(sectionId);
-        if (target) target.style.display = 'block';
-
-        navItems.forEach(item => {
-            item.classList.toggle('active', item.innerText.trim() === name);
-        });
-
-        document.getElementById('page-title').innerText = name;
-        if (name === 'Analyzed Channels') fetchMyChannels();
-=======
             console.error("Auth Check Failed", e);
         }
     }
@@ -207,10 +129,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const sections = {
         'Overview': 'section-overview',
         'Analytics': 'section-analytics',
-        'Videos': 'section-videos'
+        'Videos': 'section-videos',
+        'Analyzed Channels': 'section-my-channels',
+        'AI Studio': 'section-ai-studio'
     };
 
-    function showSection(sectionId) {
+    function showSection(name) {
+        const sectionId = sections[name];
+
         // Hide all sections
         Object.values(sections).forEach(id => {
             const el = document.getElementById(id);
@@ -218,170 +144,63 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // Hide welcome/results container wrapper logic specific
-        document.getElementById('welcome-message').style.display = 'none';
-        document.getElementById('dashboard-sections').style.display = 'block';
+        const welcome = document.getElementById('welcome-message');
+        if (welcome) welcome.style.display = 'none';
+
+        const dashSections = document.getElementById('dashboard-sections');
+        if (dashSections) dashSections.style.display = 'block';
 
         // Show target
         const target = document.getElementById(sectionId);
         if (target) {
             target.style.display = 'block';
-            // Also ensure AI studio is visible if in overview or analytics?
-            // User put AI at bottom, let's keep it visible always when logged in & analyzed? 
-            // Or only on Overview/Analytics? Let's show it on Overview.
-            const aiStudio = document.getElementById('ai-studio-container');
-            if (aiStudio) aiStudio.style.display = (sectionId === 'section-overview' || sectionId === 'section-analytics') ? 'block' : 'none';
         }
->>>>>>> 82fa5d1b9167d5712274c819447d13bfca8fbb70
+
+        // Update nav active state
+        navItems.forEach(item => {
+            item.classList.toggle('active', item.innerText.trim() === name);
+        });
+
+        const pageTitle = document.getElementById('page-title');
+        if (pageTitle) pageTitle.innerText = name;
+
+        if (name === 'Analyzed Channels') fetchMyChannels();
     }
 
     navItems.forEach(item => {
         item.addEventListener('click', (e) => {
             e.preventDefault();
-<<<<<<< HEAD
-            showSection(item.innerText.trim());
-        });
-    });
-
-    // fetch recently analyzed channels
-    async function fetchMyChannels() {
-        const list = document.getElementById('my-channels-list');
-        list.innerHTML = '<p>Loading...</p>';
-        try {
-            const user = JSON.parse(localStorage.getItem('user_info') || '{}');
-            const res = await fetch(`/api/my-channels?email=${encodeURIComponent(user.email)}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            const channels = await res.json();
-
-            if (channels.length === 0) {
-                list.innerHTML = '<p>No history found.</p>';
-                return;
-            }
-
-            list.innerHTML = channels.map(c => `
-                <div class="glass-card item-hover" onclick="loadHistoryChannel('${c.channel_id}')" style="cursor:pointer;">
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <img src="${c.details.thumbnail_url || ''}" style="width:40px; height:40px; border-radius:50%;">
-                        <div>
-                             <h4 style="margin:0;">${c.channel_name}</h4>
-                             <small>${new Date(c.last_analyzed).toLocaleDateString()}</small>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        } catch (e) {
-            list.innerHTML = '<p>Error loading history.</p>';
-        }
-    }
-
-    window.loadHistoryChannel = (id) => {
-        showSection('Overview');
-        document.getElementById('channel-id-1').value = id;
-        document.getElementById('analyze-btn').click();
-    };
-
-    const analyzeBtn = document.getElementById('analyze-btn');
-    const inputsContainer = document.getElementById('channel-inputs-container');
-    const compareToggle = document.getElementById('compare-mode-toggle');
-    let isCompareMode = false;
-    let charts = {};
-    let currentChannelId = null;
-    let currentNextPageToken = null;
-
-    // pagination for video table
-    const loadMoreBtn = document.getElementById('load-more-btn');
-    if (loadMoreBtn) {
-        loadMoreBtn.addEventListener('click', async () => {
-            if (!currentChannelId || !currentNextPageToken) return;
-
-            try {
-                const t = await getAuthToken();
-                const res = await fetch('/api/channel/videos', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${t}` },
-                    body: JSON.stringify({ channel_id: currentChannelId, page_token: currentNextPageToken })
-                });
-
-                const data = await res.json();
-                const tbody = document.getElementById('videos-list');
-                data.videos.forEach(v => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td>${v.title}</td>
-                        <td>${new Date(v.published_at).toLocaleDateString()}</td>
-                        <td>${v.view_count.toLocaleString()}</td>
-                        <td>${v.like_count.toLocaleString()} Likes</td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-
-                currentNextPageToken = data.next_page_token;
-                if (!currentNextPageToken) loadMoreBtn.style.display = 'none';
-
-            } catch (e) {
-                console.log("load more failed");
-            }
-        });
-    }
-
-    // search suggestions logic
-=======
-            // Active state
-            navItems.forEach(n => n.classList.remove('active'));
-            item.classList.add('active');
-
             const text = item.innerText.trim();
-            const sectionId = sections[text];
-
-            if (sectionId) {
-                // Check if analyzed first?
-                // If not analyzed, maybe just show empty sections or remain on welcome
-                // But for "Settings" it should work.
-
-                // If data is loaded (we track this via global or presence of DOM elements filled)
-                // For now, assume if they click, we show the section. 
-                showSection(sectionId);
-            }
+            if (sections[text]) showSection(text);
         });
     });
 
     const analyzeBtn = document.getElementById('analyze-btn');
     const inputsContainer = document.getElementById('channel-inputs-container');
     const compareCountWrapper = document.getElementById('compare-count-wrapper');
-    const compareTopBtn = document.getElementById('compare-top-btn');
     const compareCountInput = document.getElementById('compare-count');
     const compareToggle = document.getElementById('compare-mode-toggle');
     const loadingDiv = document.getElementById('loading');
-    // const resultsArea = document.getElementById('results-area'); // Deprecated, now we have sections
 
     let isCompareMode = false;
-    let charts = {};
+    let currentChannelId = null;
+    let currentNextPageToken = null;
 
     // Helper to generate inputs - RECTANGULAR & BLACK WITH SUGGESTIONS
->>>>>>> 82fa5d1b9167d5712274c819447d13bfca8fbb70
     function createInputWithSuggestions(id, placeholder, value) {
         const wrapper = document.createElement('div');
         wrapper.className = 'suggestions-wrapper';
         wrapper.style.marginBottom = '10px';
 
         const input = document.createElement('input');
-<<<<<<< HEAD
-        input.id = id;
+        input.id = id; // Important for checkAutoAnalyze
         input.type = 'text';
         input.className = 'glass-input';
-        input.placeholder = placeholder || 'Search Channel...';
+        input.placeholder = placeholder || 'Enter YouTube Channel Name...';
+        input.setAttribute('autocomplete', 'off');
         input.value = value || '';
-        input.setAttribute('autocomplete', 'off');
-        input.style.width = '100%';
-=======
-        input.type = 'text';
-        input.className = 'glass-input';
-        input.placeholder = 'Enter YouTube Channel Name...';
-        input.setAttribute('autocomplete', 'off');
-        input.value = value;
         input.style.width = '100%';
         input.style.marginBottom = '0'; // Wrapper handles margin
->>>>>>> 82fa5d1b9167d5712274c819447d13bfca8fbb70
 
         const list = document.createElement('div');
         list.className = 'suggestions-list';
@@ -389,15 +208,11 @@ document.addEventListener('DOMContentLoaded', () => {
         wrapper.appendChild(input);
         wrapper.appendChild(list);
 
-<<<<<<< HEAD
-        let timeout = null;
-=======
         input.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault(); // Prevent form submit if any
                 list.style.display = 'none'; // Hide suggestions
-                const analyzeBtn = document.getElementById('analyze-btn');
-                if (analyzeBtn) analyzeBtn.click();
+                // Removed auto-click as per user request
             }
         });
 
@@ -405,7 +220,6 @@ document.addEventListener('DOMContentLoaded', () => {
         let timeout = null;
 
         // Clear hidden ID on user typing
->>>>>>> 82fa5d1b9167d5712274c819447d13bfca8fbb70
         input.addEventListener('input', () => {
             delete input.dataset.resolvedId;
         });
@@ -425,7 +239,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     list.innerHTML = '<div style="padding:10px 15px; color:var(--text-secondary); font-size:0.9rem;">Loading...</div>';
                     list.style.display = 'block';
 
-                    // console.log("Fetching suggestions for:", q); 
                     const res = await fetch(`/api/suggestions?q=${encodeURIComponent(q)}`);
 
                     if (res.status === 429) {
@@ -463,13 +276,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 input.value = item.getAttribute('data-title');
                                 input.dataset.resolvedId = item.getAttribute('data-id');
                                 list.style.display = 'none';
-<<<<<<< HEAD
-                                // const analyzeBtn = document.getElementById('analyze-btn');
-                                // if (analyzeBtn) analyzeBtn.click();
-=======
-                                const analyzeBtn = document.getElementById('analyze-btn');
-                                if (analyzeBtn) analyzeBtn.click();
->>>>>>> 82fa5d1b9167d5712274c819447d13bfca8fbb70
+                                // Removed auto-click as per user request
                             });
                         });
 
@@ -493,7 +300,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // Close on blur (delayed to allow click)
-        // Or close on doc click
         document.addEventListener('click', (e) => {
             if (!wrapper.contains(e.target)) {
                 list.style.display = 'none';
@@ -503,20 +309,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return wrapper;
     }
 
-<<<<<<< HEAD
-    // update input fields when toggle changes
-    function updateInputs() {
-        if (!inputsContainer) return;
-        const currentVals = Array.from(inputsContainer.querySelectorAll('input')).map(i => i.value);
-        inputsContainer.innerHTML = '';
-
-        inputsContainer.appendChild(createInputWithSuggestions('channel-id-1', 'Channel 1 Name or ID', currentVals[0]));
-
-        if (isCompareMode) {
-            const count = parseInt(document.getElementById('compare-count').value) || 2;
-            for (let i = 2; i <= count; i++) {
-                inputsContainer.appendChild(createInputWithSuggestions(`channel-id-${i}`, `Channel ${i} Name or ID`, currentVals[i - 1]));
-=======
     function updateInputs() {
         const inputs = inputsContainer.querySelectorAll('input');
         const currentVals = Array.from(inputs).map(i => i.value);
@@ -531,7 +323,7 @@ document.addEventListener('DOMContentLoaded', () => {
         inputsContainer.appendChild(w1);
 
         if (isCompareMode) {
-            const count = parseInt(compareCountInput.value) || 2;
+            const count = parseInt(compareCountInput ? compareCountInput.value : 2) || 2;
             for (let i = 2; i <= count; i++) {
                 const w = createInputWithSuggestions(
                     `channel-id-${i}`,
@@ -539,89 +331,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     currentVals[i - 1] || ''
                 );
                 inputsContainer.appendChild(w);
->>>>>>> 82fa5d1b9167d5712274c819447d13bfca8fbb70
             }
         }
     }
 
-<<<<<<< HEAD
+    // Toggle Mode
     if (compareToggle) {
         compareToggle.addEventListener('change', (e) => {
             isCompareMode = e.target.checked;
-            document.getElementById('compare-count-wrapper').style.display = isCompareMode ? 'inline-block' : 'none';
+            if (compareCountWrapper) compareCountWrapper.style.display = isCompareMode ? 'inline-block' : 'none';
             updateInputs();
         });
     }
 
-    document.getElementById('compare-count')?.addEventListener('change', updateInputs);
-    updateInputs();
-
-    // modal for when multiple channels are found
-    function showSelectionModal(options, callback) {
-        const modal = document.createElement('div');
-        modal.className = 'glass-card';
-        modal.style = 'position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); z-index:10000; padding:20px; max-width:400px; width:90%; background:#1e1e2e; border:1px solid #333;';
-
-        let html = '<h3 style="margin-top:0;">Select Channel</h3><div style="max-height:300px; overflow-y:auto;">';
-        options.forEach(opt => {
-            html += `
-                <div class="opt-item" onclick="this.parentElement.dataset.val='${opt.id}'; this.parentElement.nextElementSibling.click();" style="display:flex; align-items:center; gap:10px; padding:10px; cursor:pointer; border-bottom:1px solid #333;">
-                    <img src="${opt.thumbnail}" style="width:40px; border-radius:50%;">
-                    <span>${opt.title}</span>
-                </div>
-            `;
-        });
-        html += '</div><button class="btn-primary" style="width:100%; margin-top:10px;">Select</button>';
-        modal.innerHTML = html;
-
-        const overlay = document.createElement('div');
-        overlay.style = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999;';
-        document.body.appendChild(overlay);
-        document.body.appendChild(modal);
-
-        modal.querySelector('button').onclick = () => {
-            const selected = modal.querySelector('.opt-item').parentElement.dataset.val;
-            if (selected) callback(selected);
-            modal.remove();
-            overlay.remove();
-        };
+    if (compareCountInput) {
+        compareCountInput.addEventListener('change', updateInputs);
     }
-
-    // handle analyze button click
-    analyzeBtn.addEventListener('click', async () => {
-        const inputs = Array.from(inputsContainer.querySelectorAll('input'));
-        const ids = inputs.map(i => i.value.trim()).filter(v => v !== '');
-
-        if (ids.length === 0) return alert('Enter channel name or ID');
-        if (isCompareMode && ids.length < 2) return alert('Enter at least 2 channels');
-
-        document.getElementById('loading').style.display = 'block';
-        const endpoint = isCompareMode ? '/api/compare' : '/api/analyze-channel';
-        const user = JSON.parse(localStorage.getItem('user_info') || '{}');
-
-        try {
-            const t = await getAuthToken();
-            const res = await fetch(endpoint, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${t}` },
-                body: JSON.stringify(isCompareMode ? { channel_ids: ids, email: user.email } : { channel_id: ids[0], email: user.email })
-            });
-            const data = await res.json();
-
-            if (res.status === 300) {
-                document.getElementById('loading').style.display = 'none';
-                showSelectionModal(data.options, (id) => {
-                    const idx = data.input_index || 0;
-                    inputs[idx].value = id;
-=======
-    // Toggle Mode
-    compareToggle.addEventListener('change', (e) => {
-        isCompareMode = e.target.checked;
-        compareCountWrapper.style.display = isCompareMode ? 'inline-block' : 'none';
-        updateInputs();
-    });
-
-    compareCountInput.addEventListener('change', updateInputs);
 
     // Initial Input Setup
     updateInputs();
@@ -699,961 +424,971 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.appendChild(overlay);
     }
 
-    analyzeBtn.addEventListener('click', async () => {
-        const inputs = inputsContainer.querySelectorAll('input');
-        // Capture specific inputs to update them easily later if ambiguity happens
-        const inputElements = Array.from(inputs);
+    if (analyzeBtn) {
+        analyzeBtn.addEventListener('click', async () => {
+            const inputs = inputsContainer.querySelectorAll('input');
+            const inputElements = Array.from(inputs);
+            const ids = inputElements.map(inp => inp.dataset.resolvedId || inp.value.trim()).filter(val => val !== '');
 
-        // Use hidden ID if available (from suggestion selection), else use text value
-        const ids = inputElements.map(inp => inp.dataset.resolvedId || inp.value.trim()).filter(val => val !== '');
+            if (ids.length === 0) return alert('Please enter a Channel Name or ID');
+            if (isCompareMode && ids.length < 2) return alert('Please enter at least 2 channels for comparison');
 
-        if (ids.length === 0) return alert('Please enter a Channel Name or ID');
-        if (isCompareMode && ids.length < 2) return alert('Please enter at least 2 channels for comparison');
+            // Client-side Unique Check
+            const uniqueIds = new Set(ids);
+            if (uniqueIds.size !== ids.length) {
+                return alert("Please enter distinct Channel Names/IDs.");
+            }
 
-        // Validation: Duplicates (skip for names as they might resolve differently, but good to warn if identical strings)
-        // Let's rely on backend resolution for strictness, but client-side strictness:
-        const uniqueIds = new Set(ids);
-        if (uniqueIds.size !== ids.length) {
-            return alert("Please enter distinct Channel Names/IDs.");
-        }
+            if (loadingDiv) loadingDiv.style.display = 'block';
+            const welcome = document.getElementById('welcome-message');
+            if (welcome) welcome.style.display = 'none';
+            // Don't hide dashboard sections yet, wait for data
 
-        loadingDiv.style.display = 'block';
-        document.getElementById('welcome-message').style.display = 'none';
-        document.getElementById('dashboard-sections').style.display = 'none';
+            const user = JSON.parse(localStorage.getItem('user_info') || '{}');
+            const email = user.email;
 
-        const endpoint = isCompareMode ? '/api/compare' : '/api/analyze';
-        const payload = isCompareMode ? { channel_ids: ids } : { channel_id: ids[0] };
+            const endpoint = isCompareMode ? '/api/compare' : '/api/analyze';
+            const payload = isCompareMode ? { channel_ids: ids, email: email } : { channel_id: ids[0], email: email };
 
-        try {
-            const token = await getAuthToken();
-            const res = await fetch(endpoint, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(payload)
-            });
-
-            const data = await res.json();
-
-            // Handle Ambiguity (300)
-            if (res.status === 300 && data.ambiguous) {
-                loadingDiv.style.display = 'none';
-
-                // If comparison, we know which index caused it
-                // If single, it's just the one input
-
-                showSelectionModal(data.options, (selectedId) => {
-                    // Update the input with the RESOLVED ID
-                    if (isCompareMode && data.input_index !== undefined) {
-                        inputElements[data.input_index].value = selectedId;
-                    } else {
-                        inputElements[0].value = selectedId;
-                    }
-                    // Auto-click analyze again to proceed
->>>>>>> 82fa5d1b9167d5712274c819447d13bfca8fbb70
-                    analyzeBtn.click();
+            try {
+                const token = await getAuthToken();
+                const res = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(payload)
                 });
+
+                const data = await res.json();
+
+                if (res.status === 300 && data.ambiguous) {
+                    if (loadingDiv) loadingDiv.style.display = 'none';
+                    showSelectionModal(data.options, (selectedId) => {
+                        if (isCompareMode && data.input_index !== undefined) {
+                            inputElements[data.input_index].value = selectedId;
+                        } else {
+                            inputElements[0].value = selectedId;
+                        }
+                        analyzeBtn.click();
+                    });
+                    return;
+                }
+
+                if (!res.ok) throw new Error(data.error);
+
+                if (loadingDiv) loadingDiv.style.display = 'none';
+
+                // Show sections
+                const dashSections = document.getElementById('dashboard-sections');
+                if (dashSections) dashSections.style.display = 'block';
+
+                showSection('Overview');
+
+                if (isCompareMode) {
+                    if (window.renderComparison) renderComparison(data);
+                } else {
+                    if (window.renderDashboard) renderDashboard(data);
+                }
+
+                currentChannelId = !isCompareMode ? data.channel.id : null; // For pagination
+
+                // Refresh My Channels if analyze specific
+                fetchMyChannels();
+
+            } catch (e) {
+                if (loadingDiv) loadingDiv.style.display = 'none';
+                alert('Error: ' + e.message);
+            }
+        });
+    }
+
+    // fetch recently analyzed channels
+    async function fetchMyChannels() {
+        const list = document.getElementById('my-channels-list');
+        if (!list) return;
+
+        list.innerHTML = '<p>Loading...</p>';
+        try {
+            const user = JSON.parse(localStorage.getItem('user_info') || '{}');
+            const res = await fetch(`/api/my-channels?email=${encodeURIComponent(user.email)}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const channels = await res.json();
+
+            if (channels.length === 0) {
+                list.innerHTML = '<p>No history found.</p>';
                 return;
             }
 
-<<<<<<< HEAD
-            if (!res.ok) throw new Error(data.error);
-
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('channel-header-wrapper').style.display = 'block';
-            showSection('Overview');
-
-            if (isCompareMode) renderComparison(data);
-            else renderDashboard(data);
-
-            fetchMyChannels();
+            list.innerHTML = channels.map(c => `
+                <div class="glass-card item-hover" onclick="loadHistoryChannel('${c.channel_id}')" style="cursor:pointer; margin-bottom:10px; padding:10px;">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <img src="${c.details.thumbnail_url || ''}" style="width:40px; height:40px; border-radius:50%;">
+                        <div>
+                             <h4 style="margin:0; font-size:1rem;">${c.channel_name}</h4>
+                             <small style="color:var(--text-secondary);">${new Date(c.last_analyzed).toLocaleDateString()}</small>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
         } catch (e) {
-            document.getElementById('loading').style.display = 'none';
-            alert('Error: ' + e.message);
+            list.innerHTML = '<p>Error loading history.</p>';
         }
-    });
+    }
 
-    // AI Studio UI toggles
+    window.loadHistoryChannel = (id) => {
+        showSection('Overview');
+        const input = document.getElementById('channel-id-1');
+        if (input) input.value = id;
+        const analyzeBtn = document.getElementById('analyze-btn');
+        if (analyzeBtn) analyzeBtn.click();
+    };
+
+    // Pagination
+    const loadMoreBtn = document.getElementById('load-more-btn');
+    if (loadMoreBtn) {
+        loadMoreBtn.addEventListener('click', async () => {
+            if (!currentChannelId || !currentNextPageToken) return;
+
+            try {
+                const t = await getAuthToken();
+                const res = await fetch('/api/channel/videos', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${t}` },
+                    body: JSON.stringify({ channel_id: currentChannelId, page_token: currentNextPageToken })
+                });
+
+                const data = await res.json();
+                const tbody = document.getElementById('videos-list');
+                data.videos.forEach(v => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${v.title}</td>
+                        <td>${new Date(v.published_at).toLocaleDateString()}</td>
+                        <td>${v.view_count.toLocaleString()}</td>
+                        <td>${v.like_count.toLocaleString()} Likes</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                currentNextPageToken = data.next_page_token;
+                if (!currentNextPageToken) loadMoreBtn.style.display = 'none';
+
+            } catch (e) {
+                console.log("load more failed");
+            }
+        });
+    }
+
+    // AI Studio Logic (Simplified)
     window.openAiTool = (id) => {
-        document.getElementById('ai-selection-grid').style.display = 'none';
-        document.getElementById('ai-tool-workspace').style.display = 'block';
+        const grid = document.getElementById('ai-selection-grid');
+        const workspace = document.getElementById('ai-tool-workspace');
+        if (grid) grid.style.display = 'none';
+        if (workspace) workspace.style.display = 'block';
+
         document.querySelectorAll('.ai-tool-panel').forEach(p => p.style.display = 'none');
-        document.getElementById(`tool-${id}`).style.display = 'block';
+        const panel = document.getElementById(`tool-${id}`);
+        if (panel) panel.style.display = 'block';
     };
 
     window.closeAiTool = () => {
-        document.getElementById('ai-tool-workspace').style.display = 'none';
-        document.getElementById('ai-selection-grid').style.display = 'grid';
+        const grid = document.getElementById('ai-selection-grid');
+        const workspace = document.getElementById('ai-tool-workspace');
+        if (workspace) workspace.style.display = 'none';
+        if (grid) grid.style.display = 'grid';
     };
+    // --- VIDEO COMPARISON LOGIC ---
+    function renderVideoComparisonOptions(videos) {
+        const selectA = document.getElementById('vid-comp-select-a');
+        const selectB = document.getElementById('vid-comp-select-b');
+        if (!selectA || !selectB) return;
 
-    // run ai tool
-    async function runAiTool(type, inputId, outputId, btnId) {
-        const input = document.getElementById(inputId);
-        const output = document.getElementById(outputId);
-        const btn = document.getElementById(btnId);
-        const val = input.value.trim();
+        const opts = videos.map((v, i) => {
+            // Enhanced label for comparison: [Channel] Title
+            const label = v.channel_title ? `[${v.channel_title}] ${v.title}` : v.title;
+            return `<option value="${i}">${label.substring(0, 60)}...</option>`;
+        }).join('');
+        selectA.innerHTML = '<option value="">Select Video A</option>' + opts;
+        selectB.innerHTML = '<option value="">Select Video B</option>' + opts;
 
-        if (!val) return alert('Enter something first');
+        const btnCompare = document.getElementById('btn-compare-videos');
+        if (btnCompare) {
+            // Remove old listeners to avoid dupes (cloneNode trick or just robust logic)
+            const newBtn = btnCompare.cloneNode(true);
+            btnCompare.parentNode.replaceChild(newBtn, btnCompare);
 
-        btn.disabled = true;
-        btn.innerText = 'Working...';
-        output.style.display = 'none';
+            newBtn.addEventListener('click', () => {
+                const idxA = selectA.value;
+                const idxB = selectB.value;
+                if (idxA === '' || idxB === '') return alert("Please select two videos");
 
-        try {
-            const t = await getAuthToken();
-            const url = type === 'name' ? '/api/ai/generate-channel-name' : '/api/ai/generate-title-description';
-            const body = type === 'name' ? { topic: val } : { video_topic: val };
+                const vidA = videos[idxA];
+                const vidB = videos[idxB];
 
-            const res = await fetch(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${t}` },
-                body: JSON.stringify(body)
-            });
-            const data = await res.json();
+                const results = document.getElementById('video-comp-results');
+                results.style.display = 'block';
 
-            output.style.display = 'block';
-            if (type === 'name') {
-                output.innerHTML = `<h4>Names:</h4><p>${data.names.join(', ')}</p>`;
-            } else if (type === 'title') {
-                output.innerHTML = `<h4>Titles:</h4><ul>${data.titles.map(t => `<li>${t}</li>`).join('')}</ul>`;
-            } else {
-                output.innerHTML = `<h4>Description:</h4><p>${data.description}</p>`;
-            }
-        } catch (e) {
-            alert('AI failed');
-        } finally {
-            btn.disabled = false;
-            btn.innerText = 'Generate';
-        }
-    }
+                // Compare Logic
+                const winColor = 'color:var(--success); font-weight:bold;';
 
-    document.getElementById('btn-gen-title')?.addEventListener('click', () => runAiTool('title', 'ai-title-input', 'ai-title-output', 'btn-gen-title'));
-    document.getElementById('btn-gen-desc')?.addEventListener('click', () => runAiTool('desc', 'ai-desc-input', 'ai-desc-output', 'btn-gen-desc'));
-    document.getElementById('btn-gen-name')?.addEventListener('click', () => runAiTool('name', 'ai-name-input', 'ai-name-output', 'btn-gen-name'));
+                const cmp = (valA, valB, fmt = (x) => x.toLocaleString()) => {
+                    if (valA > valB) return [`<span style="${winColor}">${fmt(valA)}</span>`, fmt(valB)];
+                    if (valB > valA) return [fmt(valA), `<span style="${winColor}">${fmt(valB)}</span>`];
+                    return [fmt(valA), fmt(valB)];
+                };
 
-    // show top 10 videos table
-    function renderTopVideos(videos) {
-        const tbody = document.getElementById('videos-list');
-        if (!tbody) return;
-        tbody.innerHTML = '';
-        const sorted = [...videos].sort((a, b) => b.view_count - a.view_count).slice(0, 10);
-        sorted.forEach(v => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${v.title}</td>
-                <td>${new Date(v.published_at).toLocaleDateString()}</td>
-                <td>${v.view_count.toLocaleString()}</td>
-                <td>${v.like_count.toLocaleString()}</td>
-            `;
-            tbody.appendChild(tr);
-        });
-    }
+                const [viewsA, viewsB] = cmp(vidA.views, vidB.views);
+                const [likesA, likesB] = cmp(vidA.likes, vidB.likes);
+                const [commA, commB] = cmp(vidA.comments, vidB.comments);
 
-    // update best time UI on analytics tab
-    function updateStrategyUI(strategy) {
-        if (!strategy) return;
-        const timeEl = document.getElementById('best-upload-time');
-        const dayEl = document.getElementById('best-upload-day');
-        if (timeEl) timeEl.innerText = strategy.best_upload_time || '--:--';
-        if (dayEl) dayEl.innerText = strategy.best_upload_day || 'Unknown';
-    }
-
-    // fallback for missing avatars
-    function getAvatar(url) {
-        if (!url || url.includes('default')) return 'https://cdn-icons-png.flaticon.com/512/847/847969.png';
-        return url;
-    }
-
-    // main function to update dashboard with channel data
-    function renderDashboard(data) {
-        currentChannelId = data.channel.id;
-        currentNextPageToken = data.next_page_token;
-
-        document.getElementById('channel-thumb').src = getAvatar(data.channel.thumbnail_url);
-        document.getElementById('channel-title').innerText = data.channel.title;
-        document.getElementById('channel-desc').innerText = data.channel.description ? data.channel.description.substring(0, 100) + '...' : 'No description';
-
-        // update numbers
-        document.getElementById('kpi-subs').innerText = parseInt(data.channel.subscriber_count).toLocaleString();
-        document.getElementById('kpi-views').innerText = parseInt(data.channel.view_count).toLocaleString();
-        document.getElementById('kpi-engagement').innerText = data.kpis.engagement_rate + '%';
-        document.getElementById('kpi-earnings').innerText = '$' + (data.kpis.estimated_earnings || 0).toLocaleString();
-
-        // render charts and tables
-        renderCharts([data.channel.title], [data.videos], data.growth, data.strategy);
-        renderTopVideos(data.videos || []);
-        updateStrategyUI(data.strategy || {});
-        renderEngagementOutliers(data.videos || []);
-        fetchMonthlyReport(data.channel.id);
-    }
-
-    // fetch monthly stats for the report table
-    async function fetchMonthlyReport(channelId) {
-        const container = document.getElementById('monthly-report-container');
-        try {
-            const t = await getAuthToken();
-            const res = await fetch(`/api/reports/monthly/${channelId}`, { headers: { 'Authorization': `Bearer ${t}` } });
-            const data = await res.json();
-            window.currentMonthlyReportData = data.report || [];
-            renderMonthlyTable();
-        } catch (e) {
-            container.innerHTML = 'Error loading report';
-        }
-    }
-
-    // render the monthly report table with current filters
-    function renderMonthlyTable() {
-        const mode = document.getElementById('report-view-mode')?.value || 'last-6';
-        let data = window.currentMonthlyReportData || [];
-
-        if (mode === 'last-6') data = data.slice(0, 6);
-        else if (mode === 'last-12') data = data.slice(0, 12);
-
-        const container = document.getElementById('monthly-report-container');
-        if (!data.length) {
-            container.innerHTML = '<p>No data found.</p>';
-            return;
-        }
-
-        let html = '<table class="modern-table"><thead><tr><th>Month</th><th>Views</th><th>Subs</th><th>Likes</th></tr></thead><tbody>';
-        data.forEach(r => {
-            html += `<tr><td>${r.month}</td><td>${r.total_views.toLocaleString()}</td><td>${r.total_subscribers.toLocaleString()}</td><td>${r.likes.toLocaleString()}</td></tr>`;
-        });
-        html += '</tbody></table>';
-        container.innerHTML = html;
-    }
-
-    window.toggleReportFilters = () => renderMonthlyTable();
-
-    // show highest/lowest engagement videos
-    function renderEngagementOutliers(videos) {
-        if (videos) window.currentVideos = videos;
-        const container = document.getElementById('engagement-outliers-list');
-        const mode = document.getElementById('engagement-outlier-filter')?.value || 'highest';
-        const vList = window.currentVideos || [];
-
-        const sorted = [...vList].map(v => {
-            const rate = ((v.like_count + v.comment_count) / (v.view_count || 1)) * 100;
-            return { ...v, rate };
-        }).sort((a, b) => mode === 'highest' ? b.rate - a.rate : a.rate - b.rate).slice(0, 5);
-
-        let html = '<ul style="list-style:none; padding:0;">';
-        sorted.forEach(v => {
-            html += `<li style="padding:8px 0; border-bottom:1px solid #333; display:flex; justify-content:space-between;">
-                        <span>${v.title.substring(0, 30)}...</span>
-                        <span style="font-weight:bold;">${v.rate.toFixed(1)}%</span>
-                     </li>`;
-        });
-        html += '</ul>';
-        container.innerHTML = html;
-    }
-
-    // create charts using Chart.js
-    function renderCharts(labels, videosData, growthData, strategyData) {
-        // cleanup old charts
-        Object.keys(charts).forEach(k => {
-            if (charts[k]) charts[k].destroy();
-        });
-
-        const vData = videosData[0] || [];
-        const titles = vData.map(v => v.title.substring(0, 10) + '...');
-        const views = vData.map(v => v.view_count);
-        const likes = vData.map(v => v.like_count);
-
-        // Views Chart
-        const ctxV = document.getElementById('viewsChart');
-        if (ctxV) {
-            charts.views = new Chart(ctxV, {
-                type: 'bar',
-                data: { labels: titles, datasets: [{ label: 'Views', data: views, backgroundColor: '#6366f1' }] }
-            });
-        }
-
-        // Engagement Pie
-        const ctxE = document.getElementById('engagementChart');
-        if (ctxE) {
-            charts.eng = new Chart(ctxE, {
-                type: 'pie',
-                data: { labels: titles.slice(0, 5), datasets: [{ data: likes.slice(0, 5), backgroundColor: ['#f43f5e', '#ef4444', '#f59e0b', '#10b981', '#3b82f6'] }] }
-            });
-        }
-
-        // Growth Line
-        const ctxG = document.getElementById('growthChart');
-        if (ctxG && growthData) {
-            charts.growth = new Chart(ctxG, {
-                type: 'line',
-                data: {
-                    labels: growthData.map(g => g.date),
-                    datasets: [{ label: 'Subscribers', data: growthData.map(g => g.subscribers), borderColor: '#10b981', tension: 0.3 }]
-                }
-            });
-        }
-
-        // Likes vs Comments Chart
-        const ctxLvC = document.getElementById('likesVsCommentsChart');
-        if (ctxLvC) {
-            const top5 = vData.slice(0, 5);
-            charts.lvc = new Chart(ctxLvC, {
-                type: 'line',
-                data: {
-                    labels: top5.map(v => v.title.substring(0, 10) + '...'),
-                    datasets: [
-                        { label: 'Likes', data: top5.map(v => v.like_count), borderColor: '#3b82f6', tension: 0.3 },
-                        { label: 'Comments', data: top5.map(v => v.comment_count), borderColor: '#f43f5e', tension: 0.3 }
-                    ]
-                }
-            });
-        }
-    }
-
-    // handle channel comparison results
-    function renderComparison(data) {
-        const results = data.results || [];
-        const header = document.querySelector('.channel-header-card');
-        if (header) header.innerHTML = results.map(r => `<h3>${r.channel.title}</h3>`).join(' <small>VS</small> ');
-
-        const grid = document.querySelector('.dashboard-grid');
-        if (grid) {
-            grid.innerHTML = `
-                <div class="glass-card" style="grid-column: 1/-1;">
-                    <h4>Comparison Summary</h4>
-                    <p>Comparing ${results.length} channels side by side.</p>
-                </div>
-                ${results.map(r => `
-                    <div class="glass-card">
-                        <h4>${r.channel.title}</h4>
-                        <p>Subs: ${parseInt(r.channel.subscriber_count).toLocaleString()}</p>
-                        <p>Views: ${parseInt(r.channel.view_count).toLocaleString()}</p>
-                        <p>ER: ${r.kpis.engagement_rate}%</p>
+                results.innerHTML = `
+                    <div class="glass-table-container">
+                        <table class="modern-table" style="width:100%;">
+                            <thead>
+                                <tr>
+                                    <th>Metric</th>
+                                    <th>${vidA.title.substring(0, 20)}...</th>
+                                    <th>${vidB.title.substring(0, 20)}...</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>Views</td><td>${viewsA}</td><td>${viewsB}</td></tr>
+                                <tr><td>Likes</td><td>${likesA}</td><td>${likesB}</td></tr>
+                                <tr><td>Comments</td><td>${commA}</td><td>${commB}</td></tr>
+                                <tr><td>Date</td><td>${new Date(vidA.published_at).toLocaleDateString()}</td><td>${new Date(vidB.published_at).toLocaleDateString()}</td></tr>
+                            </tbody>
+                        </table>
                     </div>
-                `).join('')}
-            `;
+                `;
+            });
         }
     }
 
-    // video comparison tool
-    window.setupVideoComparison = (videosA, videosB) => {
-        const selA = document.getElementById('vid-comp-select-a');
-        const selB = document.getElementById('vid-comp-select-b');
-        const btn = document.getElementById('btn-compare-videos');
-        const result = document.getElementById('video-comp-results');
+    // Inject into renderDashboard
+    const originalRenderDashboard = window.renderDashboard;
+    window.renderDashboard = (data) => {
+        // ... (reuse the previous logic, just add the new call)
+        // Since I can't easily "inject" into the function I just wrote without replacing it entirely, 
+        // I will re-declare renderDashboard fully.
 
-        if (!selA || !selB) return;
+        const { channel, kpis, videos, growth, strategy } = data;
 
-        const listA = videosA || [];
-        const listB = videosB || listA;
+        // 1. Header & Text
+        const headerWrapper = document.getElementById('channel-header-wrapper');
+        if (headerWrapper) headerWrapper.style.display = 'block';
 
-        const html = (list) => '<option value="">Select Video...</option>' + list.map((v, i) => `<option value="${i}">${v.title.substring(0, 40)}...</option>`).join('');
-        selA.innerHTML = html(listA);
-        selB.innerHTML = html(listB);
+        document.getElementById('channel-title').innerText = channel.title;
+        document.getElementById('channel-desc').innerText = channel.description ? channel.description.substring(0, 150) + '...' : 'No description';
+        document.getElementById('channel-thumb').src = channel.thumbnail_url;
 
-        if (btn) {
-            btn.onclick = () => {
-                const vA = listA[selA.value];
-                const vB = listB[selB.value];
-                if (!vA || !vB) return alert('Select two videos');
+        // KPIs
+        const formatKpi = (num) => num ? num.toLocaleString() : '-';
+        document.getElementById('kpi-subs').innerText = formatKpi(channel.subscriber_count);
+        document.getElementById('kpi-views').innerText = formatKpi(channel.view_count);
+        document.getElementById('kpi-engagement').innerText = kpis.engagement_rate + '%';
+        document.getElementById('kpi-earnings').innerText = '$' + formatKpi(kpis.estimated_earnings);
 
-                result.style.display = 'block';
-                result.innerHTML = `
-                    <table class="modern-table">
-                        <tr><th>Metric</th><th>Video 1</th><th>Video 2</th></tr>
-                        <tr><td>Views</td><td>${vA.view_count.toLocaleString()}</td><td>${vB.view_count.toLocaleString()}</td></tr>
-                        <tr><td>Likes</td><td>${vA.like_count.toLocaleString()}</td><td>${vB.like_count.toLocaleString()}</td></tr>
-                    </table>
-                `;
-            };
-        }
+        // 2. Charts
+        renderCharts(videos, growth, kpis);
+
+        // 3. Reports & Videos
+        renderMonthlyReportPlaceholder(videos);
+        renderVideosTable(videos);
+        renderVideoComparisonOptions(videos); // NEW CALL
     };
 
-    function renderTrendTable(trends) {
-        const container = document.getElementById('trend-table-container');
-        if (!container || !trends?.length) return;
+    let charts = {};
 
-        let html = '<table style="width:100%; font-size:0.9rem;">';
-        trends.forEach(t => {
-            html += `<tr><td>${t.title.substring(0, 20)}...</td><td style="text-align:right;">${t.change}%</td></tr>`;
-        });
-        html += '</table>';
-        container.innerHTML = html;
-=======
-            if (!res.ok) throw new Error(data.error || 'Server error');
-
-            loadingDiv.style.display = 'none';
-            document.getElementById('dashboard-sections').style.display = 'block';
-
-            // Default to overview
-            showSection('section-overview');
-
-            if (isCompareMode) {
-                renderComparison(data);
-            } else {
-                renderDashboard(data);
+    function renderCharts(videos, growth, kpis) {
+        // Helper to destroy old
+        const destroy = (id) => {
+            if (charts[id]) {
+                charts[id].destroy();
+                charts[id] = null;
             }
+        };
 
-            // Show AI Studio
-            document.getElementById('ai-studio-container').style.display = 'block';
+        // A. Views Chart (Line)
+        destroy('viewsChart');
+        const ctxViews = document.getElementById('viewsChart');
+        if (ctxViews) {
+            // Sort videos by date for time series? Or just top videos?
+            // Let's do top 10 videos by views for the overview chart
+            const sortedByViews = [...videos].sort((a, b) => b.views - a.views).slice(0, 10);
 
-        } catch (err) {
-            loadingDiv.style.display = 'none';
-            alert(err.message);
-            console.error(err);
+            charts['viewsChart'] = new Chart(ctxViews, {
+                type: 'bar',
+                data: {
+                    labels: sortedByViews.map(v => v.title.substring(0, 15) + '...'),
+                    datasets: [{
+                        label: 'Views',
+                        data: sortedByViews.map(v => v.views),
+                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: { responsive: true, plugins: { legend: { display: false }, title: { display: true, text: 'Top 10 Videos by Views' } } }
+            });
         }
-    });
 
-    // Compare Top 5 Logic
-    compareTopBtn.addEventListener('click', async () => {
-        if (confirm("Load top 5 channels from database for comparison?")) {
-            loadingDiv.style.display = 'block';
-            document.getElementById('welcome-message').style.display = 'none';
-            document.getElementById('dashboard-sections').style.display = 'none';
-            try {
-                const token = await getAuthToken();
-                const res = await fetch('/api/compare/top', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const data = await res.json();
+        // B. Engagement Split (Stacked Bar for Top 10)
+        destroy('engagementChart');
+        const ctxEng = document.getElementById('engagementChart');
+        if (ctxEng) {
+            // Re-sort or reuse sortedByViews (Top 10 by views usually maps to high engagement)
+            // Or sort by total engagement? Let's stick to top 10 by Views for consistency with first chart
+            const topVideos = [...videos].sort((a, b) => b.views - a.views).slice(0, 10);
 
-                if (!res.ok) throw new Error(data.error || 'Error fetching top channels');
-
-                loadingDiv.style.display = 'none';
-                document.getElementById('dashboard-sections').style.display = 'block';
-
-                // Force compare mode UI state if not already
-                if (!isCompareMode) {
-                    compareToggle.click();
+            charts['engagementChart'] = new Chart(ctxEng, {
+                type: 'bar',
+                data: {
+                    labels: topVideos.map(v => v.title.substring(0, 15) + '...'),
+                    datasets: [
+                        {
+                            label: 'Likes',
+                            data: topVideos.map(v => v.likes),
+                            backgroundColor: '#34d399',
+                        },
+                        {
+                            label: 'Comments',
+                            data: topVideos.map(v => v.comments),
+                            backgroundColor: '#60a5fa',
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        title: { display: true, text: 'Engagement Split (Top 10 Videos)' }
+                    },
+                    scales: {
+                        x: { stacked: true },
+                        y: { stacked: true }
+                    }
                 }
-
-                showSection('section-overview'); // Show overview for comparison
-                renderComparison(data);
-                document.getElementById('ai-studio-container').style.display = 'block';
-
-            } catch (err) {
-                console.error(err);
-                loadingDiv.style.display = 'none';
-                alert('Failed to load top channels');
-            }
-        }
-    });
-
-    // Helper for Faceless Avatar
-    const getAvatar = (url) => {
-        // Basic check if url is valid or simulated; if empty or 404-ish, use default
-        if (!url || url.includes('default') || url === '') {
-            // Return a faceless vector placeholder
-            return 'https://cdn-icons-png.flaticon.com/512/847/847969.png'; // Generic Faceless Avatar
-        }
-        return url;
-    };
-
-    function renderDashboard(data) {
-        // Reset Comparison UI
-        const viewsChartCard = document.getElementById('viewsChart').parentElement;
-        if (viewsChartCard) viewsChartCard.style.display = 'block';
-        const compContainer = document.getElementById('comparison-charts-container');
-        if (compContainer) compContainer.style.display = 'none';
-
-        // Update Channel Info
-        // Note: We are using IDs like 'channel-thumb', 'kpi-subs' which are unique and exist in 'section-overview'
-        const thumb = document.getElementById('channel-thumb');
-        const title = document.getElementById('channel-title');
-        const desc = document.getElementById('channel-desc');
-
-        if (thumb) thumb.src = getAvatar(data.channel.thumbnail_url);
-        if (title) title.innerText = data.channel.title;
-        if (desc) desc.innerText = data.channel.description ? data.channel.description.substring(0, 100) + '...' : 'No description';
-
-        // KPI Grid
-        document.getElementById('kpi-subs').innerText = parseInt(data.channel.subscriber_count).toLocaleString();
-        document.getElementById('kpi-views').innerText = parseInt(data.channel.view_count).toLocaleString();
-        // avg-views might not be in overview in new design? Let's check HTML. 
-        // We have Views, Subs, Engagement, Earnings.
-        // engagement
-        document.getElementById('kpi-engagement').innerText = data.kpis.engagement_rate + '%';
-
-        const earningsEl = document.getElementById('kpi-earnings');
-        if (earningsEl) {
-            earningsEl.innerText = '$' + (data.kpis.estimated_earnings || 0).toLocaleString();
-        }
-
-        // Show specific elements for single mode
-        const analyticsSection = document.getElementById('section-analytics');
-        if (analyticsSection) {
-            const h2 = analyticsSection.querySelector('h2');
-            if (h2) h2.style.display = 'block';
-        }
-        const stratChart = document.getElementById('uploadStrategyChart');
-        if (stratChart) stratChart.parentElement.style.display = 'block';
-        const engChart = document.getElementById('engagementChart');
-        if (engChart) engChart.parentElement.style.display = 'block';
-        document.querySelector('.table-container').parentElement.style.display = 'block';
-
-
-        // Charts
-        renderCharts([data.channel.title], [data.videos], data.growth, data.strategy);
-
-
-        // Videos Table
-        const tbody = document.getElementById('videos-list');
-        tbody.innerHTML = '';
-        const topVideos = (data.segments && data.segments.top_views) ? data.segments.top_views : data.videos.slice(0, 5);
-        topVideos.forEach(video => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td style="font-weight:500;">${video.title}</td>
-                <td style="color:var(--text-secondary);">${new Date(video.published_at).toLocaleDateString()}</td>
-                <td>${parseInt(video.views || video.view_count).toLocaleString()}</td>
-                 <td>${video.engagement_rate || '-'}%</td>
-            `;
-            tbody.appendChild(tr);
-        });
-
-        // Monthly
-        fetchMonthlyReport(data.channel.id);
-    }
-
-    async function fetchMonthlyReport(channelId) {
-        const container = document.getElementById('monthly-report-container');
-        container.innerHTML = '<p style="text-align:center; color:var(--text-secondary);">Loading report...</p>';
-        try {
-            const token = await getAuthToken();
-            const res = await fetch(`/api/reports/monthly/${channelId}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
             });
-
-            if (!res.ok) {
-                container.innerHTML = '<p style="text-align:center; color:var(--text-secondary);">No monthly data available yet.</p>';
-                return;
-            }
-
-            const data = await res.json();
-            const report = data.report;
-
-            if (!report || report.length === 0) {
-                container.innerHTML = '<p style="text-align:center; color:var(--text-secondary);">Not enough data for monthly report.</p>';
-                return;
-            }
-
-            let html = `
-                <table class="modern-table">
-                    <thead>
-                        <tr>
-                            <th>Month</th>
-                            <th>Total Views</th>
-                            <th>Subscribers</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
-
-            report.forEach(r => {
-                html += `
-                    <tr>
-                        <td>${r.month}</td>
-                        <td>${r.total_views.toLocaleString()}</td>
-                        <td>${r.total_subscribers.toLocaleString()}</td>
-                    </tr>
-                `;
-            });
-
-            html += '</tbody></table>';
-            container.innerHTML = html;
-
-        } catch (e) {
-            console.error("Report Error", e);
-            container.innerHTML = '<p style="text-align:center; color:var(--text-error);">Failed to load report.</p>';
         }
-    }
 
-    // Global chart instances to destroy before re-creating
-    // charts variable is already declared at the top scope of this function.
-
-    function renderCharts(labels, videosData, growthData, strategyData) {
-        // Destroy existing to avoid overlap
-        ['viewsChart', 'engagementChart', 'growthChart', 'uploadStrategyChart'].forEach(id => {
-            if (charts[id]) charts[id].destroy();
-        });
-
-        const ctxViews = document.getElementById('viewsChart').getContext('2d');
-        const ctxEng = document.getElementById('engagementChart').getContext('2d');
-
-        // 1. Views Bar Chart
-        // Check if single or multi data
-        // Single mode: videosData is [ [videos...] ]
-        const videos = videosData[0] || [];
-        const videoLabels = videos.map(v => v.title ? (v.title.substring(0, 15) + '...') : '');
-        const views = videos.map(v => v.views || v.view_count);
-        const likes = videos.map(v => v.likes || v.like_count);
-
-        charts['viewsChart'] = new Chart(ctxViews, {
-            type: 'bar',
-            data: {
-                labels: videoLabels,
-                datasets: [{
-                    label: 'Views',
-                    data: views,
-                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: { responsive: true, plugins: { legend: { display: false } } }
-        });
-
-        charts['engagementChart'] = new Chart(ctxEng, {
-            type: 'doughnut',
-            data: {
-                labels: videoLabels,
-                datasets: [{
-                    data: likes,
-                    backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF']
-                }]
-            },
-            options: { responsive: true, plugins: { legend: { display: false } } }
-        });
-
-        // 3. Growth Trends (Phase 3)
-        if (growthData) {
-            const ctxGrowth = document.getElementById('growthChart').getContext('2d');
+        // C. Growth Trends (Line - Simulated or from growth data)
+        destroy('growthChart');
+        const ctxGrowth = document.getElementById('growthChart');
+        if (ctxGrowth && growth && Array.isArray(growth)) {
             charts['growthChart'] = new Chart(ctxGrowth, {
                 type: 'line',
                 data: {
-                    labels: growthData.map(d => d.date.substring(5)), // MM-DD
+                    labels: growth.map(g => g.date),
                     datasets: [{
-                        label: 'Subscribers' + (growthData[0].estimated ? ' (Simulated)' : ''),
-                        data: growthData.map(d => d.subscribers),
-                        borderColor: '#00dd88', // Success color
-                        backgroundColor: 'rgba(0, 221, 136, 0.1)',
+                        label: 'Views Trend',
+                        data: growth.map(g => g.views),
+                        borderColor: '#a78bfa',
+                        tension: 0.4,
                         fill: true,
-                        tension: 0.4
+                        backgroundColor: 'rgba(167, 139, 250, 0.1)'
                     }]
                 },
-                options: {
-                    responsive: true,
-                    scales: { y: { beginAtZero: false, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { display: false } } },
-                    plugins: { legend: { display: false } }
-                }
+                options: { responsive: true, plugins: { legend: { display: false }, title: { display: true, text: '30 Day View Trend' } } }
             });
         }
 
-        // 4. Upload Strategy (Phase 3)
-        if (strategyData && strategyData.heatmap) {
-            const ctxStrat = document.getElementById('uploadStrategyChart').getContext('2d');
+        // D. Likes vs Comments (Line Graph Correlation)
+        destroy('likesVsCommentsChart');
+        const ctxLvC = document.getElementById('likesVsCommentsChart');
+        if (ctxLvC) {
+            // Sort by views or date to make the line make sense? 
+            // Usually correlation is strictly scatter, but if line, we need an order. 
+            // Let's sort by Views Descending to see if higher views = higher engagement generally
+            const sorted = [...videos].sort((a, b) => b.views - a.views).slice(0, 20); // Top 20 for readability
 
-            // Group by Day for simplified Bar Chart
-            const dayOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-            const dayScores = {};
-            dayOrder.forEach(d => dayScores[d] = 0);
-
-            strategyData.heatmap.forEach(h => {
-                if (dayScores[h.day] !== undefined) dayScores[h.day] += h.score;
-            });
-
-            charts['uploadStrategyChart'] = new Chart(ctxStrat, {
-                type: 'bar',
+            charts['likesVsCommentsChart'] = new Chart(ctxLvC, {
+                type: 'line',
                 data: {
-                    labels: dayOrder,
-                    datasets: [{
-                        label: 'Avg Views Performance',
-                        data: dayOrder.map(d => dayScores[d]),
-                        backgroundColor: dayOrder.map(d => d === strategyData.best_day ? '#ff4757' : 'rgba(255, 255, 255, 0.2)'),
-                        borderRadius: 4
-                    }]
+                    labels: sorted.map(v => v.title.substring(0, 10) + '...'),
+                    datasets: [
+                        {
+                            label: 'Likes',
+                            data: sorted.map(v => v.likes),
+                            borderColor: '#34d399',
+                            yAxisID: 'y',
+                        },
+                        {
+                            label: 'Comments',
+                            data: sorted.map(v => v.comments),
+                            borderColor: '#f472b6',
+                            yAxisID: 'y1',
+                        }
+                    ]
                 },
                 options: {
                     responsive: true,
-                    scales: { y: { display: false }, x: { grid: { display: false } } },
-                    plugins: { legend: { display: false } }
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: { display: true, text: 'Likes' }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: { display: true, text: 'Comments' },
+                            grid: {
+                                drawOnChartArea: false,
+                            },
+                        },
+                    }
                 }
             });
+        }
+    }
 
-            const bestDayEl = document.getElementById('best-upload-day');
-            if (bestDayEl) {
-                bestDayEl.innerText = strategyData.best_day !== 'N/A'
-                    ? `🚀 Best Post Day: ${strategyData.best_day}`
-                    : 'Not enough data';
+    // --- ALL VIDEOS PAGINATION ---
+
+    function renderVideosTable(videos, append = false) {
+        const tbody = document.getElementById('videos-list');
+        if (!tbody) return;
+
+        let toRender = videos;
+
+        if (!append) {
+            tbody.innerHTML = '';
+            // STRICT REQUIREMENT: Show only 10 initially.
+            // If the backend returns 50, we only show 10.
+            // The Next Page Token handles the rest from API.
+            toRender = videos.slice(0, 10);
+        }
+
+        toRender.forEach(v => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>
+                    <div style="font-weight:500;">${v.title}</div>
+                    <div style="font-size:0.8rem; color:var(--text-secondary);">${v.duration}</div>
+                </td>
+                <td>${new Date(v.published_at).toLocaleDateString()}</td>
+                <td>${v.views.toLocaleString()}</td>
+                <td>
+                    <i class="fas fa-thumbs-up" style="color:var(--success); font-size:0.8rem;"></i> ${v.likes.toLocaleString()}
+                    <span style="margin-left:10px; color:var(--text-secondary);"><i class="fas fa-comment"></i> ${v.comments.toLocaleString()}</span>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        // Handle Existing "Load More" Button logic
+        let btn = document.getElementById('load-more-btn');
+        if (btn) {
+            btn.onclick = loadMoreVideos;
+            // Visibility check logic
+            if (!currentNextPageToken) {
+                btn.parentElement.style.display = 'none'; // Hide wrapper
+            } else {
+                btn.parentElement.style.display = 'block';
             }
         }
     }
 
-    function renderComparison(data) {
-        const results = data.results || [];
+    async function loadMoreVideos() {
+        if (!window.currentChannelId || !currentNextPageToken) return;
 
-        // Comparison Header
-        // We will repurpose the single-channel header card for the VS view
-        // Comparison Header - Multi-Avatar Display
-        const infoArea = document.querySelector('#section-overview .channel-header-card');
-
-        if (infoArea) {
-            // Force container style for multi-avatar horizontal layout
-            infoArea.style.display = 'flex';
-            infoArea.style.flexDirection = 'row'; // Explicitly horizontal
-            infoArea.style.alignItems = 'center';
-            infoArea.style.justifyContent = 'center';
-            infoArea.style.gap = '30px'; // Increased gap for better separation
-            infoArea.style.flexWrap = 'nowrap'; // Prevent wrapping to keep it horizontal
-            infoArea.style.overflowX = 'auto'; // scroll if too small (mobile safe)
-
-            infoArea.innerHTML = results.map(res => `
-                <div class="comp-channel-header" style="text-align:center; min-width: 120px; flex-shrink: 0;">
-                    <h2 style="font-size:1.8rem; margin:0; font-weight:700; color: white;">${res.channel.title}</h2>
-                </div>
-            `).join('<div style="font-weight:900; font-size:1.5rem; font-style: italic; color:var(--text-secondary); margin: 0 15px;">VS</div>');
+        const btn = document.getElementById('load-more-btn');
+        if (btn) {
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+            btn.disabled = true;
         }
 
-        // KPI Comparison - Dynamic Rows
-        const createKpiRows = (label, valueAccessor, isPercent = false) => {
-            return results.map(res => {
-                let val = valueAccessor(res);
-                if (isPercent) val = val + '%';
-                else val = typeof val === 'number' ? val.toLocaleString() : val;
-                // Add color/style
-                return `<div style="display:flex; justify-content:space-between; margin-bottom:5px; padding-bottom:5px; border-bottom:1px solid rgba(255,255,255,0.05);">
-                            <span style="color:var(--text-secondary); font-size:0.9rem;">${res.channel.title}</span>
-                            <span style="font-weight:600;">${val}</span>
-                        </div>`;
-            }).join('');
-        };
+        try {
+            const res = await fetch('/api/channel/videos', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    channel_id: window.currentChannelId,
+                    page_token: currentNextPageToken
+                })
+            });
+            const data = await res.json();
 
-        // Update KPI Grid (Reuse existing IDs or clear/rebuild)
-        // The HTML has a fixed grid. We should replace the content of each card or rebuild the grid.
-        // Easier to rebuild grid for comparison mode.
-        // Determine Leader based on Subs
-        // Sort by subs desc
-        const sorted = [...results].sort((a, b) => parseInt(b.channel.subscriber_count) - parseInt(a.channel.subscriber_count));
-        const winner = sorted[0];
-        const gap = parseInt(winner.channel.subscriber_count) - parseInt(sorted[1].channel.subscriber_count);
+            if (data.videos) {
+                currentNextPageToken = data.next_page_token;
+                window.currentVideos = (window.currentVideos || []).concat(data.videos);
+                renderVideosTable(data.videos, true);
+                renderMonthlyTable();
+            }
+        } catch (e) {
+            console.error("Load More Error:", e);
+        } finally {
+            if (btn) {
+                btn.innerHTML = '<i class="fas fa-arrow-down"></i> Load More Videos';
+                btn.disabled = false;
+            }
+        }
+    }
 
-        // Update KPI Grid (Reuse existing IDs or clear/rebuild)
-        const dashboardGrid = document.querySelector('#section-overview .dashboard-grid');
-        if (dashboardGrid) {
-            dashboardGrid.innerHTML = `
-                <div class="glass-card" style="grid-column: 1 / -1; background: rgba(124, 58, 237, 0.1); border: 1px solid rgba(124, 58, 237, 0.3);">
-                    <h3 style="color:#a78bfa; margin-bottom:5px;"><i class="fas fa-trophy"></i> Market Leader</h3>
-                    <div style="font-size:1.1rem;">
-                        <strong>${winner.channel.title}</strong> is leading by <span style="color:var(--success); font-weight:bold;">${gap.toLocaleString()}</span> subscribers.
+    // --- ENHANCED ANALYTICS RENDER ---
+
+    // 1. Engagement Outliers (Unchanged)
+    window.renderEngagementOutliers = () => {
+        const videos = window.currentVideos || [];
+        const filter = document.getElementById('engagement-outlier-filter')?.value || 'highest';
+        const list = document.getElementById('engagement-outliers-list');
+
+        if (!list) return;
+
+        const withRate = videos.map(v => {
+            const rate = ((v.likes + v.comments) / Math.max(v.views, 1)) * 100;
+            return { ...v, rate };
+        });
+
+        const sorted = withRate.sort((a, b) => filter === 'highest' ? b.rate - a.rate : a.rate - b.rate).slice(0, 5);
+
+        list.innerHTML = sorted.map(v => `
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
+                <div style="width:70%;">
+                    <div style="font-size:0.85rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${v.title}</div>
+                    <div style="font-size:0.7rem; color:var(--text-secondary);">${v.views.toLocaleString()} views</div>
+                </div>
+                <div style="color:${filter === 'highest' ? 'var(--success)' : 'var(--error)'}; font-weight:bold; font-size:0.9rem;">
+                    ${v.rate.toFixed(2)}%
+                </div>
+            </div>
+        `).join('');
+    };
+
+    // 2. Report Headers Helper
+    window.toggleReportFilters = () => {
+        const mode = document.getElementById('report-view-mode').value;
+        const picker = document.getElementById('report-month-picker');
+        if (picker) {
+            picker.style.display = (mode === 'specific') ? 'inline-block' : 'none';
+        }
+        renderMonthlyTable();
+    };
+
+    // 3. Monthly Report Table (Corrected for Data Filtering)
+    window.renderMonthlyTable = () => {
+        const videos = window.currentVideos || [];
+        const mode = document.getElementById('report-view-mode')?.value || 'last-12';
+        const specificMonth = document.getElementById('report-month-picker')?.value; // YYYY-MM
+
+        const container = document.getElementById('monthly-report-container');
+        if (!container) return;
+
+        // Generate Monthly Data
+        const monthly = {};
+
+        // Filter Logic Setup
+        let cutoffDate = new Date();
+        let targetYM = null;
+
+        if (mode === 'last-6') cutoffDate.setMonth(cutoffDate.getMonth() - 6);
+        else if (mode === 'last-12') cutoffDate.setMonth(cutoffDate.getMonth() - 12);
+        else if (mode === 'all') cutoffDate = new Date(0); // 1970
+        else if (mode === 'specific' && specificMonth) {
+            targetYM = specificMonth; // "2023-10"
+        }
+
+        videos.forEach(v => {
+            const d = new Date(v.published_at);
+            const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+
+            // Filter
+            if (mode === 'specific') {
+                if (targetYM && ym !== targetYM) return;
+            } else {
+                if (d < cutoffDate) return;
+            }
+
+            if (!monthly[ym]) monthly[ym] = { views: 0, likes: 0, comments: 0, count: 0 };
+            monthly[ym].views += v.views;
+            monthly[ym].likes += v.likes;
+            monthly[ym].comments += v.comments;
+            monthly[ym].count++;
+        });
+
+        const sortedKeys = Object.keys(monthly).sort().reverse();
+
+        // Render Table
+        container.innerHTML = `
+            <table class="modern-table" style="width:100%;">
+                <thead>
+                    <tr>
+                        <th>Month</th>
+                        <th>Uploads</th>
+                        <th>Total Views</th>
+                        <th>Avg Engagement</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${sortedKeys.length > 0 ? sortedKeys.map(key => {
+            const m = monthly[key];
+            const avgEng = ((m.likes + m.comments) / m.count).toFixed(0);
+            return `
+                            <tr>
+                                <td>${key}</td>
+                                <td>${m.count}</td>
+                                <td>${m.views.toLocaleString()}</td>
+                                <td>${parseInt(avgEng).toLocaleString()}</td>
+                            </tr>
+                        `;
+        }).join('') : `<tr><td colspan="4" style="text-align:center; padding:20px; color:var(--text-secondary);">
+                        No data found for this period.<br><small>Try "Load More Videos" below to fetch older history.</small>
+                    </td></tr>`}
+                </tbody>
+            </table>
+        `;
+    };
+
+    // Replaces placeholder - Entry Point
+    function renderMonthlyReportPlaceholder(videos) {
+        window.currentVideos = videos;
+        renderEngagementOutliers();
+        if (typeof window.toggleReportFilters === 'function') {
+            // Ensure picker state is correct
+            const mode = document.getElementById('report-view-mode');
+            if (mode && mode.value === 'specific') document.getElementById('report-month-picker').style.display = 'inline-block';
+        }
+        renderMonthlyTable();
+    }
+    // Garbage Removed
+
+    // --- RENDER COMPARISON ---
+    window.renderComparison = (data) => {
+        const results = data.results;
+
+        // 1. Clear Single Channel Elements
+        const channelHeader = document.getElementById('channel-header-wrapper');
+        if (channelHeader) channelHeader.style.display = 'none';
+
+        // Hide standard charts if visible
+        ['viewsChart', 'engagementChart', 'growthChart', 'likesVsCommentsChart'].forEach(id => {
+            const c = document.getElementById(id);
+            if (c) {
+                const p = c.parentElement;
+                if (p) p.style.display = 'none';
+            }
+        });
+
+        // 2. Render KPI Cards Side-by-Side
+        const overview = document.getElementById('section-overview');
+
+        // Clean up previous
+        const existingComp = document.getElementById('comparison-output-area');
+        if (existingComp) existingComp.remove();
+
+        const existingChart = document.getElementById('comparison-chart-area');
+        if (existingChart) existingChart.remove();
+
+        // Create Container
+        const container = document.createElement('div');
+        container.id = 'comparison-output-area';
+
+        let gridHtml = '<div class="comparison-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:20px; margin-top:30px;">';
+
+        let allVideos = [];
+
+        results.forEach(res => {
+            const ch = res.channel;
+            const k = res.kpis;
+
+            if (res.videos) {
+                // Ensure proper property access
+                const tagged = res.videos.map(v => ({ ...v, channel_title: ch.title }));
+                allVideos = [...allVideos, ...tagged];
+            }
+
+            gridHtml += `
+                <div class="glass-card">
+                    <div style="text-align:center; margin-bottom:20px;">
+                        <img src="${ch.thumbnail_url}" style="width:80px; height:80px; border-radius:50%; margin-bottom:10px;">
+                        <h3>${ch.title}</h3>
+                        <p>${parseInt(ch.subscriber_count).toLocaleString()} Subs</p>
                     </div>
-                </div>
-
-                <div class="glass-card">
-                    <h3 style="margin-bottom:10px;">Total Views</h3>
-                    ${createKpiRows('Total Views', r => parseInt(r.channel.view_count))}
-                </div>
-                <div class="glass-card">
-                     <h3 style="margin-bottom:10px;">Engagement Rate</h3>
-                    ${createKpiRows('Engagement Rate', r => r.kpis.engagement_rate, true)}
-                </div>
-                <div class="glass-card">
-                     <h3 style="margin-bottom:10px;">Avg Views/Video</h3>
-                    ${createKpiRows('Avg Views', r => r.kpis.avg_views)}
-                </div>
-                <div class="glass-card">
-                     <h3 style="margin-bottom:10px;">Est. Earnings</h3>
-                    ${createKpiRows('Earnings', r => '$' + r.kpis.estimated_earnings)}
+                    <div class="metric-row" style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.1);">
+                        <span>Total Views</span>
+                        <strong>${parseInt(ch.view_count).toLocaleString()}</strong>
+                    </div>
+                    <div class="metric-row" style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.1);">
+                         <span>Video Count</span>
+                         <strong>${parseInt(ch.video_count).toLocaleString()}</strong>
+                    </div>
+                    <div class="metric-row" style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.1);">
+                         <span>Avg Views/Video</span>
+                         <strong>${k.avg_views.toLocaleString()}</strong>
+                    </div>
+                    <div class="metric-row" style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.1);">
+                         <span>Engagement Rate</span>
+                         <strong style="color:var(--success);">${k.engagement_rate}%</strong>
+                    </div>
+                     <div class="metric-row" style="display:flex; justify-content:space-between; padding:10px 0;">
+                         <span>Est. Earnings</span>
+                         <strong style="color:var(--accent);">$${k.estimated_earnings.toLocaleString()}</strong>
+                    </div>
                 </div>
             `;
-        }
-
-        // Hide specific analytics elements for Comparison Mode
-        // We need to hide the Growth Chart container specifically as requested
-        const growthChartEl = document.getElementById('growthChart');
-        if (growthChartEl) growthChartEl.parentElement.style.display = 'none';
-
-        const analyticsSection = document.getElementById('section-analytics');
-        if (analyticsSection) {
-            const h2 = analyticsSection.querySelector('h2');
-            if (h2) h2.style.display = 'none'; // Hide "Deep Dive Analytics" header
-        }
-        const stratChart = document.getElementById('uploadStrategyChart');
-        if (stratChart) stratChart.parentElement.style.display = 'none'; // Hide "Best Upload Time"
-
-        // Charts for Comparison
-        ['viewsChart', 'engagementChart', 'growthChart', 'uploadStrategyChart'].forEach(id => {
-            if (charts[id]) charts[id].destroy();
         });
+        gridHtml += '</div>';
+        container.innerHTML = gridHtml;
+        overview.appendChild(container);
 
-        const ctxViews = document.getElementById('viewsChart').getContext('2d');
-        charts['viewsChart'] = new Chart(ctxViews, {
-            type: 'bar',
-            data: {
-                labels: ['Engagement Rate (%)'],
-                datasets: results.map((res, idx) => ({
-                    label: res.channel.title,
-                    data: [res.kpis.engagement_rate],
-                    backgroundColor: idx === 0 ? 'rgba(54, 162, 235, 0.6)' : 'rgba(255, 99, 132, 0.6)',
-                    borderColor: idx === 0 ? 'rgba(54, 162, 235, 1)' : 'rgba(255, 99, 132, 1)',
-                    borderWidth: 1
-                }))
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    title: { display: true, text: 'Engagement Comparison', font: { size: 16 } }
-                }
-            }
-        });
+        // 3. Render Likes vs Comments Comparison Chart
+        const chartContainer = document.createElement('div');
+        chartContainer.id = 'comparison-chart-area';
+        chartContainer.className = 'glass-card';
+        chartContainer.style.marginTop = '20px';
+        chartContainer.innerHTML = '<h3><i class="fas fa-balance-scale"></i> Engagement Comparison (Avg per Video)</h3><canvas id="compChart"></canvas>';
+        overview.appendChild(chartContainer);
 
-        const ctxEng = document.getElementById('engagementChart').getContext('2d');
-
-        // Calculate Avg Likes and Comments from the videos array for better accuracy than just rate
-        const engagementData = results.map((res, idx) => {
-            const vids = res.videos || [];
-            if (vids.length === 0) return { title: res.channel.title, likes: 0, comments: 0 };
-
-            const totalLikes = vids.reduce((sum, v) => sum + (parseInt(v.likes || v.like_count) || 0), 0);
-            const totalComments = vids.reduce((sum, v) => sum + (parseInt(v.comments || v.comment_count) || 0), 0);
-
-            return {
-                title: res.channel.title,
-                avgLikes: Math.round(totalLikes / vids.length),
-                avgComments: Math.round(totalComments / vids.length),
-                color: idx === 0 ? 'rgba(54, 162, 235, 0.7)' : 'rgba(255, 99, 132, 0.7)',
-                borderColor: idx === 0 ? 'rgba(54, 162, 235, 1)' : 'rgba(255, 99, 132, 1)'
-            };
-        });
-
-        // 2. Engagement Comparison Chart (Bar)
-        charts['engagementChart'] = new Chart(ctxEng, {
-            type: 'bar',
-            data: {
-                labels: ['Avg Likes', 'Avg Comments'],
-                datasets: results.map((res, idx) => ({
-                    label: res.channel.title,
-                    data: [engagementData[idx].avgLikes, engagementData[idx].avgComments],
-                    backgroundColor: engagementData[idx].color,
-                    borderColor: engagementData[idx].borderColor,
-                    borderWidth: 1
-                }))
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    title: { display: true, text: 'Engagement per Video', color: '#9ca3af' }
+        const ctx = document.getElementById('compChart');
+        if (ctx) {
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: results.map(r => r.channel.title),
+                    datasets: [
+                        {
+                            label: 'Avg Likes',
+                            data: results.map(r => {
+                                const vids = r.videos || [];
+                                const totalLikes = vids.reduce((s, v) => s + v.likes, 0);
+                                return vids.length ? Math.round(totalLikes / vids.length) : 0;
+                            }),
+                            backgroundColor: '#34d399'
+                        },
+                        {
+                            label: 'Avg Comments',
+                            data: results.map(r => {
+                                const vids = r.videos || [];
+                                const totalComms = vids.reduce((s, v) => s + v.comments, 0);
+                                return vids.length ? Math.round(totalComms / vids.length) : 0;
+                            }),
+                            backgroundColor: '#60a5fa'
+                        }
+                    ]
                 },
-                scales: {
-                    y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } },
-                    x: { grid: { display: false } }
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
                 }
-            }
+            });
+        }
+
+        // 4. Update Video Comparison Tool
+        renderVideoComparisonOptions(allVideos, results.map(r => r.channel.title));
+    };
+
+    // --- VIDEO COMPARISON TOOL HELPER ---
+    window.renderVideoComparisonOptions = (videos, expectedChannels = []) => {
+        const selA = document.getElementById('vid-comp-select-a');
+        const selB = document.getElementById('vid-comp-select-b');
+
+        if (!selA || !selB) return;
+
+        // Group videos by channel
+        const byChannel = {};
+        videos.forEach(v => {
+            const ch = v.channel_title || 'Current Channel';
+            if (!byChannel[ch]) byChannel[ch] = [];
+            byChannel[ch].push(v);
         });
 
-        // Ensure container is visible
-        document.getElementById('engagementChart').parentElement.style.display = 'block';
+        // Debug
+        console.log("Video Comp - Videos By Channel:", Object.keys(byChannel));
+        console.log("Video Comp - Expected Channels:", expectedChannels);
 
-        // Hide Table
-        document.querySelector('.table-container').parentElement.style.display = 'none';
+        // HELPER: Build Options for a specific list of videos
+        const buildOptionsForVideos = (vids) => {
+            let html = '<option value="">Select Video...</option>';
+            if (!vids || vids.length === 0) return html;
 
-        // Show Video Comparison Tool if in Comparison Mode
-        // Populate Dropdowns
-        const tool = document.getElementById('video-comparison-tool');
-        const sel1 = document.getElementById('vid-select-1');
-        const sel2 = document.getElementById('vid-select-2');
-        const btnComp = document.getElementById('btn-compare-vids');
+            vids.sort((a, b) => b.views - a.views).forEach(v => {
+                html += `<option value="${v.id}">${v.title.substring(0, 50)}${v.title.length > 50 ? '...' : ''} (${v.views.toLocaleString()} views)</option>`;
+            });
+            return html;
+        };
 
-        if (tool && results.length >= 2) {
-            tool.style.display = 'block';
+        // HELPER: Build grouped options (Fallback)
+        const buildGroupedOptions = () => {
+            let html = '<option value="">Select Video...</option>';
+            for (const [channel, vids] of Object.entries(byChannel)) {
+                html += `<optgroup label="${channel}">`;
+                vids.sort((a, b) => b.views - a.views).forEach(v => {
+                    html += `<option value="${v.id}">${v.title.substring(0, 50)}${v.title.length > 50 ? '...' : ''} (${v.views.toLocaleString()} views)</option>`;
+                });
+                html += `</optgroup>`;
+            }
+            return html;
+        };
 
-            // Populate 1
-            const vids1 = results[0].videos || [];
-            sel1.innerHTML = vids1.map((v, i) => `<option value="${i}">${v.title.substring(0, 40)}...</option>`).join('');
+        // LOGIC: Strict Split based on Expected Channels
+        if (expectedChannels.length >= 2) {
+            const chA = expectedChannels[0];
+            const chB = expectedChannels[1];
 
-            // Populate 2
-            const vids2 = results[1].videos || [];
-            sel2.innerHTML = vids2.map((v, i) => `<option value="${i}">${v.title.substring(0, 40)}...</option>`).join('');
+            // Setup A
+            selA.innerHTML = buildOptionsForVideos(byChannel[chA]);
+            if (selA.previousElementSibling) selA.previousElementSibling.textContent = `Select Video (${chA})`;
 
-            btnComp.onclick = () => {
-                const v1 = vids1[sel1.value];
-                const v2 = vids2[sel2.value];
+            // Setup B
+            selB.innerHTML = buildOptionsForVideos(byChannel[chB]);
+            if (selB.previousElementSibling) selB.previousElementSibling.textContent = `Select Video (${chB})`;
 
-                const resDiv = document.getElementById('vid-comparison-result');
-                resDiv.style.display = 'grid';
-                resDiv.style.gridTemplateColumns = '1fr 1fr';
-                resDiv.style.gap = '20px';
+        } else {
+            // Fallback
+            const opts = buildGroupedOptions();
+            selA.innerHTML = opts;
+            selB.innerHTML = opts;
 
-                const renderVidCard = (v, channelName) => `
-                    <div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:10px;">
-                        <div style="margin-bottom:10px; color:var(--text-muted); font-size:0.8rem;">${channelName}</div>
-                        <img src="${v.thumbnail_url || 'https://via.placeholder.com/320x180'}" style="width:100%; border-radius:5px; margin-bottom:10px;">
-                        <h4 style="margin-bottom:10px; font-size:0.95rem;">${v.title}</h4>
-                        
-                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:0.85rem;">
-                             <div><i class="fas fa-eye" style="color:#a78bfa;"></i> ${parseInt(v.view_count || v.views).toLocaleString()}</div>
-                             <div><i class="fas fa-thumbs-up" style="color:#a78bfa;"></i> ${parseInt(v.like_count || v.likes).toLocaleString()}</div>
-                             <div><i class="fas fa-comment" style="color:#a78bfa;"></i> ${parseInt(v.comment_count || 0).toLocaleString()}</div>
-                             <div style="color:var(--success);">Retention: ~${Math.floor(Math.random() * 40 + 30)}% (Est)</div>
-                        </div>
-                        
-                        <div style="margin-top:15px; font-size:0.8rem;">
-                            <strong>Tags:</strong> 
-                            <span style="color:var(--text-secondary);">${v.tags ? v.tags.slice(0, 3).join(', ') : 'N/A'}</span>
-                        </div>
-                         <div style="margin-top:5px; font-size:0.8rem;">
-                            <strong>Hook Score:</strong> 
-                            <span style="color:#FFBD2E;">${(['Strong', 'Medium', 'Weak'])[Math.floor(Math.random() * 3)]}</span>
-                        </div>
-                    </div>
-                 `;
-
-                resDiv.innerHTML = renderVidCard(v1, results[0].channel.title) + renderVidCard(v2, results[1].channel.title);
-            };
+            if (selA.previousElementSibling) selA.previousElementSibling.textContent = `Select Video A`;
+            if (selB.previousElementSibling) selB.previousElementSibling.textContent = `Select Video B`;
         }
+
+        window.comparisonVideosPool = videos;
+    };
+
+    // --- TRIGGER COMPARISON ---
+    const btnCompVids = document.getElementById('btn-compare-videos');
+    if (btnCompVids) {
+        btnCompVids.onclick = () => {
+            const selA = document.getElementById('vid-comp-select-a');
+            const selB = document.getElementById('vid-comp-select-b');
+            const resDiv = document.getElementById('video-comp-results');
+
+            if (!selA || !selB || !resDiv) return;
+
+            const idA = selA.value;
+            const idB = selB.value;
+
+            if (!idA || !idB) return alert("Please select two videos to compare.");
+
+            const pool = window.comparisonVideosPool || window.currentVideos || [];
+            const vA = pool.find(v => v.id === idA);
+            const vB = pool.find(v => v.id === idB);
+
+            if (!vA || !vB) return alert("Error finding video details.");
+
+            // Render Comparison Table
+            resDiv.style.display = 'block';
+            resDiv.innerHTML = `
+                <table class="modern-table" style="width:100%;">
+                    <thead>
+                        <tr>
+                            <th>Metric</th>
+                            <th style="color:var(--primary-color)">${vA.title.substring(0, 20)}...</th>
+                            <th style="color:var(--secondary-color)">${vB.title.substring(0, 20)}...</th>
+                            <th>Winner</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Views</td>
+                            <td>${vA.views.toLocaleString()}</td>
+                            <td>${vB.views.toLocaleString()}</td>
+                            <td>${vA.views > vB.views ? 'Video A' : (vB.views > vA.views ? 'Video B' : 'Tie')}</td>
+                        </tr>
+                        <tr>
+                            <td>Likes</td>
+                            <td>${vA.likes.toLocaleString()}</td>
+                            <td>${vB.likes.toLocaleString()}</td>
+                            <td>${vA.likes > vB.likes ? 'Video A' : (vB.likes > vA.likes ? 'Video B' : 'Tie')}</td>
+                        </tr>
+                        <tr>
+                            <td>Comments</td>
+                            <td>${vA.comments.toLocaleString()}</td>
+                            <td>${vB.comments.toLocaleString()}</td>
+                            <td>${vA.comments > vB.comments ? 'Video A' : (vB.comments > vA.comments ? 'Video B' : 'Tie')}</td>
+                        </tr>
+                        <tr>
+                            <td>Engagement Rate</td>
+                            <td>${((vA.likes + vA.comments) / vA.views * 100).toFixed(2)}%</td>
+                            <td>${((vB.likes + vB.comments) / vB.views * 100).toFixed(2)}%</td>
+                            <td>${((vA.likes + vA.comments) / vA.views) > ((vB.likes + vB.comments) / vB.views) ? 'Video A' : 'Video B'}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            `;
+        };
     }
 
-    // --- AI Studio Logic (Gemini Integration) ---
-    const aiGenerateBtn = document.getElementById('ai-generate-btn');
-    const aiResultsContainer = document.getElementById('ai-results-container');
-    const aiResultTitle = document.getElementById('ai-result-title');
-    const aiResultDesc = document.getElementById('ai-result-desc');
+    // --- AI STUDIO LOGIC ---
+    const setupAiBtn = (btnId, inputId, outputId, actionType) => {
+        const btn = document.getElementById(btnId);
+        if (!btn) return;
 
-    if (aiGenerateBtn) {
-        aiGenerateBtn.addEventListener('click', async () => {
-            const topic = document.getElementById('ai-topic').value;
-            const audience = document.getElementById('ai-audience').value;
-            const keywordsRaw = document.getElementById('ai-keywords').value;
-            const tone = document.getElementById('ai-tone').value;
+        btn.addEventListener('click', async () => {
+            const input = document.getElementById(inputId);
+            const output = document.getElementById(outputId);
+            if (!input || !output) return;
 
-            if (!topic) return alert('Please enter a Video Topic');
+            const topic = input.value.trim();
+            if (!topic) return alert("Please enter a topic/title");
 
-            // Parse keywords
-            const keywords = keywordsRaw.split(',').map(k => k.trim()).filter(k => k);
-
-            // UI Loading State
-            aiGenerateBtn.disabled = true;
-            aiGenerateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating Magic...';
-            aiResultsContainer.style.display = 'none';
+            btn.disabled = true;
+            btn.innerText = 'Generating...';
+            output.style.display = 'none';
 
             try {
                 const token = await getAuthToken();
-                const res = await fetch('/api/ai/generate-title-description', {
+                const res = await fetch('/api/ai/generate', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                     body: JSON.stringify({
-                        video_topic: topic,
-                        target_audience: audience || 'General',
-                        keywords: keywords,
-                        tone: tone
+                        action: actionType,
+                        topic: topic,
+                        title: topic, // for script
+                        channel_name: 'Creator'
                     })
                 });
-
                 const data = await res.json();
 
-                if (!res.ok) throw new Error(data.error || 'Failed to generate content');
+                output.style.display = 'block';
 
-                // Render Results
-                aiResultTitle.innerText = data.title;
-                aiResultDesc.value = data.description;
-                aiResultsContainer.style.display = 'block';
+                let content = data.result || 'No result generated';
+
+                // Handle Array (Video Ideas) vs String (Script)
+                if (Array.isArray(content)) {
+                    // Render list of ideas
+                    const listItems = content.map(item =>
+                        `<li style="padding:5px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
+                            <div style="font-weight:bold;">${item.title}</div>
+                            ${item.confidence ? `<div style="font-size:0.75rem; color:var(--success);">Confidence: ${item.confidence}%</div>` : ''}
+                         </li>`
+                    ).join('');
+                    content = `<ul style="list-style:none; padding:0; margin:0;">${listItems}</ul>`;
+                } else if (typeof content === 'string') {
+                    // Handle Markdown/String (Script)
+                    // Simple replacement for newlines to breaks, or basic markdown
+                    content = content.replace(/\n/g, '<br>')
+                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                        .replace(/## (.*?)(<br>|$)/g, '<h3>$1</h3>')
+                        .replace(/# (.*?)(<br>|$)/g, '<h2>$1</h2>');
+                } else {
+                    content = JSON.stringify(content);
+                }
+
+                output.innerHTML = `<div style="padding:15px; background:rgba(255,255,255,0.05); border-radius:8px; line-height:1.6;">${content}</div>`;
 
             } catch (e) {
-                console.error(e);
                 alert('AI Generation Failed: ' + e.message);
             } finally {
-                aiGenerateBtn.disabled = false;
-                aiGenerateBtn.innerHTML = '<i class="fas fa-sparkles"></i> Generate Title & Description';
+                btn.disabled = false;
+                btn.innerText = 'Generate';
             }
         });
->>>>>>> 82fa5d1b9167d5712274c819447d13bfca8fbb70
-    }
+    };
+
+    setupAiBtn('btn-gen-title', 'ai-title-input', 'ai-title-output', 'ideas');
+    setupAiBtn('btn-gen-desc', 'ai-desc-input', 'ai-desc-output', 'script'); // Reusing script endpoint for desc for now as per api.py
+    setupAiBtn('btn-gen-name', 'ai-name-input', 'ai-name-output', 'names');
+
 });

@@ -33,12 +33,9 @@
         </div>
         <ul class="nav-links">
             <li><a href="#features">Features</a></li>
-<<<<<<< HEAD
             <li><a href="#" id="nav-my-channels">My Channels</a></li>
+
             <li><a href="#blog">Blogs</a></li>
-=======
-            <li><a href="#testimonials">Testimonials</a></li>
->>>>>>> 82fa5d1b9167d5712274c819447d13bfca8fbb70
         </ul>
         <div class="nav-actions">
             <a href="/login" class="nav-link-btn">Login</a>
@@ -59,7 +56,6 @@
                 <p class="cta-note"><i class="fas fa-check-circle" style="color:var(--success);"></i> No credit card
                     required</p>
             </div>
-<<<<<<< HEAD
 
             <!-- NEW: Landing Page Search Feature -->
             <div class="landing-search-container" style="margin-top: 30px; max-width: 500px;">
@@ -123,8 +119,6 @@
                     </div>
                 </div>
             </div>
-=======
->>>>>>> 82fa5d1b9167d5712274c819447d13bfca8fbb70
         </div>
         <div class="lean-visual">
             <!-- Abstract Visual / Dashboard Preview Mini -->
@@ -277,8 +271,6 @@
         </div>
     </section>
 
-<<<<<<< HEAD
-
 
 
     <!-- Blog Section -->
@@ -287,33 +279,43 @@
             <h2 class="section-title">Latest <span class="gradient-text">Insights</span></h2>
             <p style="color:var(--text-secondary);">Tips, trends, and strategies for YouTube growth.</p>
         </div>
-        <div class="blog-grid">
+        <div class="blog-grid"
+            style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:30px;">
             <!-- Blog Card 1 -->
-            <article class="blog-card glass-effect">
-                <div class="blog-date">Oct 12, 2024</div>
-                <h3>Understanding the Algorithm in 2024</h3>
-                <p>Decoding the latest changes to YouTube's recommendation system and how to adapt your content
+            <article class="blog-card glass-effect" style="padding:20px; border-radius:15px;">
+                <div class="blog-date" style="color:var(--text-muted); font-size:0.8rem; margin-bottom:10px;">Oct 12,
+                    2024</div>
+                <h3 style="margin-bottom:10px;">Understanding the Algorithm in 2024</h3>
+                <p style="color:var(--text-secondary); margin-bottom:15px;">Decoding the latest changes to YouTube's
+                    recommendation system and how to adapt your content
                     strategy.</p>
-                <a href="#" class="read-more">Read Article <i class="fas fa-arrow-right"></i></a>
+                <a href="#" class="read-more" style="color:var(--primary-color);">Read Article <i
+                        class="fas fa-arrow-right"></i></a>
             </article>
             <!-- Blog Card 2 -->
-            <article class="blog-card glass-effect">
-                <div class="blog-date">Sep 28, 2024</div>
-                <h3>Thumbnail Design Psychology</h3>
-                <p>Why some thumbnails get clicked and others don't. A deep dive into color theory and composition.</p>
-                <a href="#" class="read-more">Read Article <i class="fas fa-arrow-right"></i></a>
+            <article class="blog-card glass-effect" style="padding:20px; border-radius:15px;">
+                <div class="blog-date" style="color:var(--text-muted); font-size:0.8rem; margin-bottom:10px;">Sep 28,
+                    2024</div>
+                <h3 style="margin-bottom:10px;">Thumbnail Design Psychology</h3>
+                <p style="color:var(--text-secondary); margin-bottom:15px;">Why some thumbnails get clicked and others
+                    don't. A deep dive into color theory and composition.</p>
+                <a href="#" class="read-more" style="color:var(--primary-color);">Read Article <i
+                        class="fas fa-arrow-right"></i></a>
             </article>
             <!-- Blog Card 3 -->
-            <article class="blog-card glass-effect">
-                <div class="blog-date">Sep 15, 2024</div>
-                <h3>Shorts vs. Long-form Content</h3>
-                <p>Balancing your channel's portfolio. How to leverage Shorts to drive traffic to your main videos.</p>
-                <a href="#" class="read-more">Read Article <i class="fas fa-arrow-right"></i></a>
+            <article class="blog-card glass-effect" style="padding:20px; border-radius:15px;">
+                <div class="blog-date" style="color:var(--text-muted); font-size:0.8rem; margin-bottom:10px;">Sep 15,
+                    2024</div>
+                <h3 style="margin-bottom:10px;">Shorts vs. Long-form Content</h3>
+                <p style="color:var(--text-secondary); margin-bottom:15px;">Balancing your channel's portfolio. How to
+                    leverage Shorts to drive traffic to your main videos.</p>
+                <a href="#" class="read-more" style="color:var(--primary-color);">Read Article <i
+                        class="fas fa-arrow-right"></i></a>
             </article>
         </div>
     </section>
 
-
+    <!-- Footer -->
 
 
     <!-- Landing Page Preview Logic -->
@@ -328,57 +330,10 @@
             } else {
                 // Not logged in -> Login -> then My Channels
                 // We pass a 'redirect' param to login page
-                window.location.href = '/login.html?redirect=my-channels';
+                window.location.href = '/login?redirect=my-channels';
             }
         });
     </script>
-=======
-    <!-- Testimonials -->
-    <section id="testimonials" class="testimony-section">
-        <h2>Used by Creators</h2>
-        <div
-            style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:20px; max-width:1000px; margin:0 auto;">
-            <div class="testimony-card">
-                <div class="user-info" style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
-                    <img src="https://ui-avatars.com/api/?name=Alex+B&background=7C3AED&color=fff"
-                        style="width:50px; height:50px; border-radius:50%; border:2px solid white;">
-                    <div style="text-align:left;">
-                        <h4 style="margin:0;">Alex Brown</h4>
-                        <span style="font-size:0.8rem; color:var(--text-muted);">100K Subscribers</span>
-                    </div>
-                </div>
-                <p style="font-style:italic; color:var(--text-secondary);">"The competitor comparison tool changed my
-                    entire content strategy. I finally know what works."</p>
-            </div>
-            <div class="testimony-card">
-                <div class="user-info" style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
-                    <img src="https://ui-avatars.com/api/?name=Sarah+J&background=EC4899&color=fff"
-                        style="width:50px; height:50px; border-radius:50%; border:2px solid white;">
-                    <div style="text-align:left;">
-                        <h4 style="margin:0;">Sarah Jenkins</h4>
-                        <span style="font-size:0.8rem; color:var(--text-muted);">Gaming Channel</span>
-                    </div>
-                </div>
-                <p style="font-style:italic; color:var(--text-secondary);">"Monthly reports help me show sponsors my
-                    real growth. Absolutely essential tool."</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Pricing Section Removed -->
-
-    <!-- Footer -->
-    <footer
-        style="margin-top:50px; padding:40px; border-top:1px solid rgba(255,255,255,0.05); text-align:center; color:var(--text-muted); font-size:0.9rem;">
-        <p>&copy; 2024 AnalyticsPro. All rights reserved.</p>
-        <div style="margin-top:15px; display:flex; justify-content:center; gap:20px;">
-            <a href="#" style="color:var(--text-muted);">Privacy</a>
-            <a href="#" style="color:var(--text-muted);">Terms</a>
-            <a href="#" style="color:var(--text-muted);">Contact</a>
-        </div>
-    </footer>
-
->>>>>>> 82fa5d1b9167d5712274c819447d13bfca8fbb70
 </body>
 
 </html>

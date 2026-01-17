@@ -9,19 +9,14 @@ function handleAuthSuccess(data) {
         localStorage.setItem('auth_token', data.token);
         localStorage.setItem('user_info', JSON.stringify(data.user));
 
-<<<<<<< HEAD
         // Redirect based on params
         const urlParams = new URLSearchParams(window.location.search);
         const redirect = urlParams.get('redirect');
         if (redirect === 'my-channels') {
-            window.location.href = '/dashboard.html#section-my-channels';
+            window.location.href = '/dashboard#section-my-channels';
         } else {
-            window.location.href = '/dashboard.html';
+            window.location.href = '/dashboard';
         }
-=======
-        // Redirect
-        window.location.href = '/dashboard';
->>>>>>> 82fa5d1b9167d5712274c819447d13bfca8fbb70
     } else {
         alert('Authentication failed: Invalid response from server.');
     }
@@ -109,8 +104,6 @@ window.handleGoogleCredentialResponse = (response) => {
         .then(res => res.json())
         .then(data => {
             if (data.status === 'success') {
-                // If backend returned a new token, use it. usage of Google ID token is also valid if backend accepted it.
-                // But our updated backend returns 'token'.
                 handleAuthSuccess(data);
             } else {
                 alert('Google Login validation failed: ' + (data.error || 'Unknown error'));
@@ -146,9 +139,6 @@ function initGoogleAuth() {
                     google.accounts.id.renderButton(btnContainer, googleBtnParams);
                 }
 
-                // Also enable One Tap? Maybe not on Login page if we have a button.
-                // google.accounts.id.prompt(); 
-<<<<<<< HEAD
             } else {
                 console.error("CRITICAL: Google Client ID is missing in backend config.");
                 // visible feedback
@@ -156,8 +146,6 @@ function initGoogleAuth() {
                 if (btnContainer) {
                     btnContainer.innerHTML = '<div style="color: grey; text-align: center; font-size: 0.9em; margin-top: 10px;">(Google Sign-In unavailable: Missing Client ID)</div>';
                 }
-=======
->>>>>>> 82fa5d1b9167d5712274c819447d13bfca8fbb70
             }
         })
         .catch(e => {
@@ -179,23 +167,16 @@ window.addEventListener('load', () => {
     if (signupForm) {
         signupForm.addEventListener('submit', handleSignupSubmit);
     }
-
-    // Check Auth State (e.g., redirect if already logged in)
-    // Only if NOT on login page
-    if (!loginForm && window.location.pathname !== '/login') {
-        // checkAuthState(); // optional
-    }
 });
 
 // Logout Helper
 window.handleSignOut = () => {
     localStorage.removeItem('auth_token');
     localStorage.removeItem('user_info');
-<<<<<<< HEAD
     sessionStorage.removeItem('auto_analyzed');
-=======
->>>>>>> 82fa5d1b9167d5712274c819447d13bfca8fbb70
-    google.accounts.id.disableAutoSelect();
+    if (window.google && window.google.accounts) {
+        google.accounts.id.disableAutoSelect();
+    }
     window.location.href = '/'; // Redirect to Landing Page
 };
 
