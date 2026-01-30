@@ -34,7 +34,7 @@ If you prefer to configure manually:
 3.  **Name**: `youtube-analytics` (or your choice).
 4.  **Runtime**: `Python 3`.
 5.  **Build Command**: `pip install -r requirements.txt`
-6.  **Start Command**: `gunicorn run:app`
+6.  **Start Command**: `gunicorn run:app --bind 0.0.0.0:$PORT`
 7.  **Environment Variables**:
     *   `PYTHON_VERSION`: `3.10.0`
     *   `FLASK_APP`: `run.py`
