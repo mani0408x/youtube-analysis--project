@@ -700,7 +700,8 @@ input:-webkit-autofill:active {
 }
 
 /* Responsive Redesign */
-@media (max-width: 768px) {
+/* Responsive Redesign */
+@media (max-width: 900px) {
     .app-container {
         grid-template-columns: 1fr;
         /* Stack sidebar and content */
@@ -708,40 +709,121 @@ input:-webkit-autofill:active {
 
     .sidebar {
         display: none;
-        /* Hide sidebar on mobile for now - TODO: Add hamburger menu */
+        /* Hide sidebar on tablet/mobile */
+        position: fixed;
+        left: -100%;
+        top: 0;
+        bottom: 0;
+        width: 250px;
+        transition: left 0.3s ease;
+        z-index: 1000;
+        background: rgba(15, 15, 19, 0.95);
+        border-right: 1px solid rgba(255, 255, 255, 0.1);
     }
 
-    .lean-hero {
+    .sidebar.active {
+        display: flex;
+        left: 0;
+    }
+
+    .top-bar {
+        margin: 10px;
+        padding: 10px 20px;
+    }
+
+    /* Reveal hamburger if we had one, for now assume top-bar suffices or we add a toggle later */
+}
+
+@media (max-width: 768px) {
+
+    /* Navbar Mobile */
+    .navbar {
+        width: 95%;
+        padding: 15px;
         flex-direction: column;
-        padding-top: 150px;
-        text-align: center;
+        gap: 15px;
+        border-radius: 20px;
+        background: rgba(15, 15, 19, 0.95);
     }
 
-    .hero-content {
-        align-items: center;
-        /* Center flex items if any */
-        margin-bottom: 50px;
+    .navbar .nav-links {
+        display: flex;
+        flex-direction: column;
+        /* Stack links */
+        gap: 15px;
+        width: 100%;
+        text-align: center;
+        padding-bottom: 10px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .nav-actions {
+        width: 100%;
+        justify-content: center;
+        gap: 15px;
+    }
+
+    /* Hero Section */
+    .landing-hero.lean-hero {
+        flex-direction: column;
+        padding: 140px 20px 50px;
+        /* More top padding for stacked nav */
+        text-align: center;
+        height: auto;
+        min-height: auto;
+    }
+
+    .lean-hero .hero-content {
+        margin-right: 0;
+        margin-bottom: 40px;
+        max-width: 100%;
+    }
+
+    .landing-hero h1 {
+        font-size: 2.2rem;
+        /* Smaller heading */
+    }
+
+    .hero-subtext {
+        font-size: 1rem;
+        margin: 0 auto 30px;
     }
 
     .lean-visual {
         width: 100%;
-        height: 300px;
+        height: 280px;
     }
 
-    .landing-hero h1 {
-        font-size: 2.5rem;
+    /* Features & Blog */
+    .features-grid,
+    .blog-grid {
+        grid-template-columns: 1fr;
+        /* Single column */
+        gap: 20px;
     }
 
+    .features-section,
+    .blog-section {
+        padding: 60px 20px;
+    }
+
+    /* Dashboard Specifics */
     .dashboard-grid {
         grid-template-columns: 1fr;
-        /* Stack dashboard cards on mobile */
+        /* Stack cards */
     }
 
     .search-container {
         width: 100%;
-        /* Full width search on mobile */
+        max-width: 100%;
+        margin-bottom: 15px;
     }
 
+    .kpi-value {
+        font-size: 1.8rem;
+    }
+
+    /* Search Input on Landing */
     .landing-search-container {
         width: 100%;
         max-width: 100%;
@@ -753,6 +835,31 @@ input:-webkit-autofill:active {
 
     .search-input-group button {
         width: 100%;
+        margin-top: 10px;
+    }
+
+    /* Table Responsive */
+    .table-container {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin-bottom: 20px;
+    }
+
+    .modern-table {
+        min-width: 600px;
+        /* Force scroll */
+    }
+
+    /* Preview Results on Landing */
+    #preview-results .preview-header {
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: left;
+    }
+
+    #preview-results img {
+        margin-bottom: 10px;
     }
 }
 
