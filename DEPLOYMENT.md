@@ -82,3 +82,4 @@ Since the domain will change after deployment:
 *   **Build Failed**: Check the logs to see if a dependency failed to install. Ensure `requirements.txt` is correct.
 *   **Application Error**: Check the **Logs** tab in Render. Common issues include missing environment variables or database connection failures.
 *   **Quota Exceeded**: If the AI features stop working, check your API quotas (Gemini/Hugging Face).
+*   **OAuth Error: "doesn't comply with Google's OAuth 2.0 policy"**: This means your Render URL is not in the "Authorized JavaScript origins". Go to Google Cloud Console > APIs & Services > Credentials, edit your Client ID, and add `https://your-app-name.onrender.com` (no trailing slash) to **Authorized JavaScript origins**.
