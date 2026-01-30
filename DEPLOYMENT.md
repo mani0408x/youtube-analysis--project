@@ -40,7 +40,7 @@ If you prefer to configure manually:
     *   `FLASK_APP`: `run.py`
     *   `SECRET_KEY`: (Generate a random string)
     *   Plus the API keys listed in Section 2.
-    *   **Note**: The project includes a `.python-version` file to ensure Render uses Python 3.9.18, which is required for compatibility.
+    *   **Note**: The project includes a `.python-version` file to ensure Render uses Python 3.10.12, which is required for compatibility.
 
 ## 4. Database Configuration
 
