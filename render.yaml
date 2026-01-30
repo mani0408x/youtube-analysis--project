@@ -2,7 +2,7 @@ services:
   - type: web
     name: youtube-analytics-platform
     runtime: python
-    buildCommand: pip install -r backend/requirements.txt
+    buildCommand: pip install -r requirements.txt
     startCommand: gunicorn run:app
     envVars:
       - key: PYTHON_VERSION

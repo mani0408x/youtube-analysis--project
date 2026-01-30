@@ -33,7 +33,7 @@ If you prefer to configure manually:
 2.  Connect your repository.
 3.  **Name**: `youtube-analytics` (or your choice).
 4.  **Runtime**: `Python 3`.
-5.  **Build Command**: `pip install -r backend/requirements.txt`
+5.  **Build Command**: `pip install -r requirements.txt`
 6.  **Start Command**: `gunicorn run:app`
 7.  **Environment Variables**:
     *   `PYTHON_VERSION`: `3.10.0`
@@ -53,7 +53,7 @@ The application supports both SQLite (default) and external databases (MySQL/Pos
     *   Provision a PostgreSQL database on Render (or use an external MySQL provider).
     *   Get the **Internal Connection URL** (if on Render) or the full connection string.
     *   Set the `DATABASE_URI` environment variable to this connection string.
-    *   **Note**: If using PostgreSQL, you may need to install `psycopg2-binary`. The current project uses `PyMySQL` for MySQL. If you choose Render's PostgreSQL, add `psycopg2-binary` to `backend/requirements.txt` and update the Protocol in the URI to `postgresql+psycopg2://...`.
+    *   **Note**: If using PostgreSQL, you may need to install `psycopg2-binary`. The current project uses `PyMySQL` for MySQL. If you choose Render's PostgreSQL, add `psycopg2-binary` to `requirements.txt` and update the Protocol in the URI to `postgresql+psycopg2://...`.
     *   **Stick to MySQL** if you want to avoid code changes, or update `requirements.txt` to include the appropriate driver for your DB choice.
 
 ## 5. Google OAuth Configuration
@@ -78,6 +78,6 @@ Since the domain will change after deployment:
 
 ## 7. Troubleshooting
 
-*   **Build Failed**: Check the logs to see if a dependency failed to install. Ensure `backend/requirements.txt` is correct.
+*   **Build Failed**: Check the logs to see if a dependency failed to install. Ensure `requirements.txt` is correct.
 *   **Application Error**: Check the **Logs** tab in Render. Common issues include missing environment variables or database connection failures.
 *   **Quota Exceeded**: If the AI features stop working, check your API quotas (Gemini/Hugging Face).
